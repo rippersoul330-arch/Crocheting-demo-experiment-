@@ -10,8 +10,6 @@
 window.SUPABASE_CONFIG = {
   url: "https://ihfcwcqngjnnfnfumjhl.supabase.co",
 
-  // TODO: paste your FULL publishable key here. The one provided looked
-  // truncated (it ended in "...."). It should be one long unbroken string
-  // that starts with "sb_publishable_".
-  publishableKey: "sb_publishable_iB2Lk4xPu6yRlMut_DIjrQ_IS8UIhOR....REPLACE_WITH_FULL_KEY"
+  // Public "anon" key — safe to expose in the browser (RLS protects your data).
+  publishableKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImloZmN3Y3FuZ2pubmZuZnVtamhsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU5OTI0MzEsImV4cCI6MjEwMTU2ODQzMX0.jCoYMFMSB9vnfYntvzex2IwBD5njwAnmOV3ZjTq6e-A"
 };
