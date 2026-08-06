@@ -59,3 +59,27 @@ Done & live: storefront UI, Custom Orders + FAQ sections, Supabase database with
 live products, forms saving to DB, admin dashboard.
 Not done (by choice / future): Stripe payments (deferred), real product photo
 uploads, replacing demo branding/copy with the real business details.
+
+
+## Future direction & owner constraints (added later)
+- **Marketplace ambition:** The owner is considering evolving this single-seller
+  shop into a **multi-vendor marketplace** where other crocheters can sign up and
+  sell their own handmade products to customers (an Etsy-style niche platform for
+  crochet). Not started yet — treat as future scope.
+  - Recommended path discussed: start lean/manual (curate a handful of sellers,
+    list their products via the existing admin), validate buyer demand FIRST, then
+    build self-service seller accounts + payouts. Avoid building full marketplace
+    plumbing before demand is proven.
+  - Technical implications when built: multi-tenant seller accounts, `seller_id`
+    on products, per-seller dashboards, order routing, moderation, and
+    **Stripe Connect** for split payments/payouts (for a marketplace, payments are
+    core rather than optional). Supabase (auth + RLS per seller + storage) fits this.
+- **Budget / shipping constraint:** The owner has **no funds to ship products
+  themselves**. Guidance agreed: shipping is funded by the customer (paid at
+  checkout, before dispatch); in a marketplace each seller ships their own goods so
+  the platform has no logistics/shipping cost. Low/no-cost starting options:
+  **local pickup**, **made-to-order (pay first)**, flat-rate shipping, and selling
+  digital patterns. Site already includes free-shipping-over-$150 logic.
+- **Payments status:** Still deferred for the single shop. If/when the marketplace
+  path is chosen, revisit payments (Stripe Connect) since it becomes essential.
+  Until any payment processor exists, prefer local pickup + pay-on-collection.
