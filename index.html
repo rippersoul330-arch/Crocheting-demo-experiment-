@@ -447,7 +447,12 @@
     </defs>
   </svg>
 
+  <!-- Supabase client (loaded from CDN, no build step) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/js/supabase-config.js"></script>
   <script src="assets/js/products.js"></script>
   <script src="assets/js/main.js"></script>
+  <!-- Data layer: loads products from Supabase + saves form submissions -->
+  <script src="assets/js/supabase-data.js"></script>
 </body>
 </html>

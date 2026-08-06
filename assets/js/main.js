@@ -3,7 +3,8 @@
    ===================================================================== */
 (function () {
   "use strict";
-  const { PRODUCTS, CATEGORIES, REVIEWS, buildScene } = window.LoopIvy;
+  let PRODUCTS = window.LoopIvy.PRODUCTS;                 // may be refreshed from Supabase
+  const { CATEGORIES, REVIEWS, buildScene } = window.LoopIvy;
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
   const money = (n) => "$" + n.toLocaleString("en-US");
@@ -393,6 +394,15 @@
   onScroll();
   window.addEventListener("scroll", onScroll, { passive: true });
 
+  /* re-render when live products arrive from Supabase */
+  document.addEventListener("loopivy:products", (e) => {
+    PRODUCTS = (e.detail && e.detail.length ? e.detail : window.LoopIvy.PRODUCTS);
+    renderFeatured();
+    renderFilters();
+    renderGrid();
+    renderCart();
+  });
+
   /* newsletter */
   $("#newsletterForm").addEventListener("submit", (e) => {
     e.preventDefault();
@@ -402,6 +412,12 @@
     if (!ok) { note.textContent = "Please enter a valid email address."; note.classList.remove("is-ok"); return; }
     note.textContent = "Welcome to the circle! Check your inbox for 10% off.";
     note.classList.add("is-ok");
+    // persist to Supabase if the backend is connected
+    if (window.LoopIvyBackend) {
+      window.LoopIvyBackend.subscribe(email).catch((err) =>
+        console.warn("[LoopIvy] newsletter save failed:", err.message || err)
+      );
+    }
     e.target.reset();
   });
 
@@ -430,10 +446,24 @@
         return;
       }
 
-      const name = $("#cfName").value.trim().split(" ")[0];
-      note.textContent = `Thank you, ${name}! I've received your request and will reply within 2 business days.`;
+      // collect the submission before we reset the form
+      const payload = {
+        name: $("#cfName").value.trim(),
+        email: $("#cfEmail").value.trim(),
+        type: $("#cfType").value,
+        budget: $("#cfBudget").value,
+        details: $("#cfDetails").value.trim(),
+      };
+      const firstName = payload.name.split(" ")[0];
+      note.textContent = `Thank you, ${firstName}! I've received your request and will reply within 2 business days.`;
       note.classList.add("is-ok");
       toast("Custom request sent — talk soon! 💛");
+      // persist to Supabase if the backend is connected
+      if (window.LoopIvyBackend) {
+        window.LoopIvyBackend.saveCustomRequest(payload).catch((err) =>
+          console.warn("[LoopIvy] custom request save failed:", err.message || err)
+        );
+      }
       customForm.reset();
       $$(".cfield", customForm).forEach((f) => f.classList.remove("is-invalid"));
     });
