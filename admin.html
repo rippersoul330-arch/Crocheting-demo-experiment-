@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Loop &amp; Ivy — Admin</title>
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Jost:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/admin.css" />
+</head>
+<body>
+
+  <!-- ============ LOGIN ============ -->
+  <div class="login" id="loginScreen">
+    <div class="login__card">
+      <div class="login__brand">
+        <span class="mark">L</span>
+        <h1>Loop &amp; Ivy</h1>
+        <p>Shop admin — please sign in</p>
+      </div>
+      <form id="loginForm" novalidate>
+        <div class="field">
+          <label for="email">Email</label>
+          <input type="email" id="email" autocomplete="username" required />
+        </div>
+        <div class="field">
+          <label for="password">Password</label>
+          <input type="password" id="password" autocomplete="current-password" required />
+        </div>
+        <button type="submit" class="btn btn--primary btn--block" id="loginBtn">Sign in</button>
+        <p class="note" id="loginNote" role="status"></p>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============ APP ============ -->
+  <div class="app" id="app">
+    <header class="topbar">
+      <div class="topbar__brand"><span class="mark">L</span> Loop &amp; Ivy Admin</div>
+      <div class="topbar__right">
+        <span class="topbar__user" id="userEmail"></span>
+        <a class="btn btn--ghost btn--sm" href="index.html" target="_blank" rel="noopener">View shop ↗</a>
+        <button class="btn btn--ghost btn--sm" id="logoutBtn">Sign out</button>
+      </div>
+    </header>
+
+    <main class="wrap">
+      <nav class="tabs" id="tabs">
+        <button class="tab is-active" data-tab="products">Products <span class="pill" id="countProducts">0</span></button>
+        <button class="tab" data-tab="requests">Custom Requests <span class="pill" id="countRequests">0</span></button>
+        <button class="tab" data-tab="subscribers">Subscribers <span class="pill" id="countSubscribers">0</span></button>
+        <button class="tab" data-tab="orders">Orders <span class="pill" id="countOrders">0</span></button>
+      </nav>
+
+      <!-- PRODUCTS -->
+      <section class="panel is-active" id="panel-products">
+        <div class="panel__head">
+          <div>
+            <h2>Products</h2>
+            <p>Add, edit, hide or remove the pieces in your shop.</p>
+          </div>
+          <button class="btn btn--primary" id="addProductBtn">+ New product</button>
+        </div>
+        <div class="card-box">
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>Product</th><th>Category</th><th>Price</th><th>Tag</th>
+                  <th>Rating</th><th>Featured</th><th>Status</th><th></th>
+                </tr>
+              </thead>
+              <tbody id="productsBody"></tbody>
+            </table>
+          </div>
+          <div class="loading" id="productsLoading"><div class="spinner"></div>Loading products…</div>
+          <div class="empty" id="productsEmpty" hidden>No products yet. Click “New product” to add your first piece.</div>
+        </div>
+      </section>
+
+      <!-- CUSTOM REQUESTS -->
+      <section class="panel" id="panel-requests">
+        <div class="panel__head">
+          <div>
+            <h2>Custom Requests</h2>
+            <p>Commission enquiries submitted through your Custom Orders form.</p>
+          </div>
+          <button class="btn btn--ghost btn--sm" data-refresh="requests">↻ Refresh</button>
+        </div>
+        <div class="card-box">
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr><th>Received</th><th>Name</th><th>Email</th><th>Project</th><th>Budget</th><th>Details</th><th>Status</th></tr>
+              </thead>
+              <tbody id="requestsBody"></tbody>
+            </table>
+          </div>
+          <div class="loading" id="requestsLoading"><div class="spinner"></div>Loading requests…</div>
+          <div class="empty" id="requestsEmpty" hidden>No custom requests yet.</div>
+        </div>
+      </section>
+
+      <!-- SUBSCRIBERS -->
+      <section class="panel" id="panel-subscribers">
+        <div class="panel__head">
+          <div>
+            <h2>Newsletter Subscribers</h2>
+            <p>People who signed up for your updates.</p>
+          </div>
+          <button class="btn btn--ghost btn--sm" data-refresh="subscribers">↻ Refresh</button>
+        </div>
+        <div class="card-box">
+          <div class="table-scroll">
+            <table>
+              <thead><tr><th>Subscribed</th><th>Email</th></tr></thead>
+              <tbody id="subscribersBody"></tbody>
+            </table>
+          </div>
+          <div class="loading" id="subscribersLoading"><div class="spinner"></div>Loading subscribers…</div>
+          <div class="empty" id="subscribersEmpty" hidden>No subscribers yet.</div>
+        </div>
+      </section>
+
+      <!-- ORDERS -->
+      <section class="panel" id="panel-orders">
+        <div class="panel__head">
+          <div>
+            <h2>Orders</h2>
+            <p>Orders will appear here once Stripe checkout is connected.</p>
+          </div>
+          <button class="btn btn--ghost btn--sm" data-refresh="orders">↻ Refresh</button>
+        </div>
+        <div class="card-box">
+          <div class="table-scroll">
+            <table>
+              <thead><tr><th>Date</th><th>Customer</th><th>Email</th><th>Total</th><th>Status</th></tr></thead>
+              <tbody id="ordersBody"></tbody>
+            </table>
+          </div>
+          <div class="loading" id="ordersLoading"><div class="spinner"></div>Loading orders…</div>
+          <div class="empty" id="ordersEmpty" hidden>No orders yet.</div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- ============ PRODUCT EDITOR MODAL ============ -->
+  <div class="modal" id="productModal" aria-hidden="true">
+    <div class="modal__overlay" data-close></div>
+    <div class="modal__panel" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modal__head">
+        <h3 id="modalTitle">New product</h3>
+        <button class="modal__close" data-close aria-label="Close">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
+        </button>
+      </div>
+      <form id="productForm" novalidate>
+        <input type="hidden" id="p_id" />
+        <div class="form-grid">
+          <div class="preview-row">
+            <img id="p_preview" alt="Preview" />
+            <span>Live preview — updates as you change the motif &amp; colours below. A real photo URL (if set) is used on the shop instead.</span>
+          </div>
+
+          <div class="field">
+            <label for="p_name">Name</label>
+            <input type="text" id="p_name" required />
+          </div>
+          <div class="field">
+            <label for="p_slug">Slug (unique)</label>
+            <input type="text" id="p_slug" placeholder="auto from name" />
+          </div>
+
+          <div class="field">
+            <label for="p_category">Category</label>
+            <select id="p_category" required>
+              <option value="blankets">Blankets &amp; Throws</option>
+              <option value="sweaters">Sweaters</option>
+              <option value="bags">Bags</option>
+              <option value="accessories">Accessories</option>
+              <option value="home">Home</option>
+              <option value="baby">Baby</option>
+              <option value="amigurumi">Amigurumi</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="p_motif">Art motif</label>
+            <select id="p_motif">
+              <option value="blanket">Blanket</option>
+              <option value="sweater">Sweater</option>
+              <option value="bag">Bag</option>
+              <option value="hat">Hat</option>
+              <option value="toy">Toy</option>
+              <option value="plant">Plant</option>
+              <option value="coaster">Coaster</option>
+              <option value="scarf">Scarf</option>
+              <option value="cushion">Cushion</option>
+              <option value="booties">Booties</option>
+            </select>
+          </div>
+
+          <div class="col-3">
+            <div class="field">
+              <label>Background</label>
+              <div class="color-field"><input type="color" id="p_bg" value="#c07a52" /><input type="text" id="p_bg_t" /></div>
+            </div>
+            <div class="field">
+              <label>Yarn</label>
+              <div class="color-field"><input type="color" id="p_yarn" value="#f4e7d6" /><input type="text" id="p_yarn_t" /></div>
+            </div>
+            <div class="field">
+              <label>Accent</label>
+              <div class="color-field"><input type="color" id="p_accent" value="#8f4c2e" /><input type="text" id="p_accent_t" /></div>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="p_price">Price ($)</label>
+            <input type="number" id="p_price" min="0" step="0.01" required />
+          </div>
+          <div class="field">
+            <label for="p_compare">Compare-at / was ($, optional)</label>
+            <input type="number" id="p_compare" min="0" step="0.01" />
+          </div>
+
+          <div class="field">
+            <label for="p_tag">Tag (optional)</label>
+            <input type="text" id="p_tag" placeholder="Bestseller, New, Sale…" />
+          </div>
+          <div class="field">
+            <label for="p_stock">Stock (blank = made to order)</label>
+            <input type="number" id="p_stock" min="0" step="1" />
+          </div>
+
+          <div class="field">
+            <label for="p_rating">Rating (0–5)</label>
+            <input type="number" id="p_rating" min="0" max="5" step="0.1" value="5.0" />
+          </div>
+          <div class="field">
+            <label for="p_reviews">Review count</label>
+            <input type="number" id="p_reviews" min="0" step="1" value="0" />
+          </div>
+
+          <div class="field">
+            <label for="p_sort">Sort order</label>
+            <input type="number" id="p_sort" step="1" value="0" />
+          </div>
+          <div class="field">
+            <label for="p_image">Photo URL (optional)</label>
+            <input type="text" id="p_image" placeholder="https://…" />
+          </div>
+
+          <div class="field col-full">
+            <label for="p_blurb">Description</label>
+            <textarea id="p_blurb"></textarea>
+          </div>
+          <div class="field col-full">
+            <label for="p_materials">Details / materials (one per line)</label>
+            <textarea id="p_materials" placeholder="100% organic cotton&#10;38 x 40 cm&#10;Made to order"></textarea>
+          </div>
+
+          <div class="col-full" style="display:flex; gap:1.5rem; flex-wrap:wrap;">
+            <label class="checkline"><input type="checkbox" id="p_featured" /> Featured on homepage</label>
+            <label class="checkline"><input type="checkbox" id="p_active" checked /> Active (visible in shop)</label>
+          </div>
+        </div>
+
+        <div class="modal__foot">
+          <button type="button" class="btn btn--danger" id="deleteProductBtn" hidden>Delete</button>
+          <span class="spacer"></span>
+          <button type="button" class="btn btn--ghost" data-close>Cancel</button>
+          <button type="submit" class="btn btn--primary" id="saveProductBtn">Save product</button>
+        </div>
+        <p class="note" id="productNote" role="status"></p>
+      </form>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" hidden></div>
+
+  <!-- Supabase + art generator + admin logic -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/js/supabase-config.js"></script>
+  <script src="assets/js/products.js"></script>
+  <script src="assets/js/admin.js"></script>
+</body>
+</html>
