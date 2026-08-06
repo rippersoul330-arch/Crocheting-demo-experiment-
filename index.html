@@ -52,9 +52,10 @@
 
       <nav class="nav" id="primaryNav" aria-label="Primary">
         <a href="#shop">Shop</a>
+        <a href="#custom">Custom Orders</a>
         <a href="#story">Our Story</a>
         <a href="#process">The Craft</a>
-        <a href="#reviews">Loved By</a>
+        <a href="#faq">FAQ</a>
       </nav>
 
       <div class="header__actions">
@@ -231,6 +232,112 @@
       </div>
     </section>
 
+    <!-- ===== Custom Orders / Commissions ===== -->
+    <section class="section custom" id="custom">
+      <div class="container custom__inner">
+        <div class="custom__intro reveal">
+          <span class="eyebrow">Made just for you</span>
+          <h2 class="section__title">Commission a one-of-a-kind piece</h2>
+          <p>Have a colour, size or idea in mind? I take on a small number of custom
+            commissions each month — bespoke blankets, made-to-measure sweaters, nursery
+            sets and heartfelt gifts, crocheted entirely by hand to your specification.</p>
+          <ul class="custom__list">
+            <li><strong>Your colours</strong><span>Choose from 40+ natural &amp; plant-dyed yarns.</span></li>
+            <li><strong>Your size</strong><span>Made to measure, from newborn to king-size throw.</span></li>
+            <li><strong>Your timeline</strong><span>Most commissions are ready in 3–5 weeks.</span></li>
+          </ul>
+          <div class="custom__how">
+            <span class="custom__how-step"><b>1</b> Share your idea</span>
+            <span class="custom__how-step"><b>2</b> Get a quote &amp; mock-up</span>
+            <span class="custom__how-step"><b>3</b> Approve &amp; I begin</span>
+          </div>
+        </div>
+
+        <form class="custom__form reveal" id="customForm" novalidate>
+          <h3 class="custom__form-title">Tell me about your project</h3>
+          <div class="cform-grid">
+            <div class="cfield">
+              <label for="cfName">Your name</label>
+              <input type="text" id="cfName" name="name" placeholder="Jane Doe" required />
+            </div>
+            <div class="cfield">
+              <label for="cfEmail">Email</label>
+              <input type="email" id="cfEmail" name="email" placeholder="you@example.com" required />
+            </div>
+            <div class="cfield">
+              <label for="cfType">What would you like made?</label>
+              <select id="cfType" name="type" required>
+                <option value="" disabled selected>Choose a piece…</option>
+                <option>Blanket or throw</option>
+                <option>Sweater or cardigan</option>
+                <option>Bag</option>
+                <option>Baby / nursery set</option>
+                <option>Amigurumi / toy</option>
+                <option>Homeware</option>
+                <option>Something else</option>
+              </select>
+            </div>
+            <div class="cfield">
+              <label for="cfBudget">Budget (optional)</label>
+              <select id="cfBudget" name="budget">
+                <option value="" disabled selected>Select a range…</option>
+                <option>Under $75</option>
+                <option>$75 – $150</option>
+                <option>$150 – $300</option>
+                <option>$300 +</option>
+              </select>
+            </div>
+            <div class="cfield cfield--full">
+              <label for="cfDetails">Describe your dream piece</label>
+              <textarea id="cfDetails" name="details" rows="4" placeholder="Colours, size, who it's for, any inspiration you've seen…" required></textarea>
+            </div>
+          </div>
+          <div class="custom__submit">
+            <button type="submit" class="btn btn--primary">Send my request</button>
+            <p class="custom__note" id="customNote" role="status"></p>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- ===== FAQ ===== -->
+    <section class="section faq" id="faq">
+      <div class="container faq__inner">
+        <header class="section__head faq__head reveal">
+          <span class="eyebrow">Good to know</span>
+          <h2 class="section__title">Questions, answered</h2>
+          <p class="section__sub">Everything about ordering, care and shipping. Still curious? Just ask.</p>
+        </header>
+
+        <div class="faq__list reveal">
+          <details class="faq__item">
+            <summary>How long until my order ships?<span class="faq__icon" aria-hidden="true"></span></summary>
+            <div class="faq__answer"><p>Every piece is crocheted by hand once you order, so ready-to-ship items post within 2–3 weeks and custom commissions within 3–5 weeks. You'll get a note the moment yours is on its way.</p></div>
+          </details>
+          <details class="faq__item">
+            <summary>Do you take custom orders?<span class="faq__icon" aria-hidden="true"></span></summary>
+            <div class="faq__answer"><p>Yes! I love bespoke work. Use the <a href="#custom">Custom Orders</a> form above to share your idea and I'll reply within two business days with a quote and a little mock-up.</p></div>
+          </details>
+          <details class="faq__item">
+            <summary>How do I care for my crochet piece?<span class="faq__icon" aria-hidden="true"></span></summary>
+            <div class="faq__answer"><p>Most pieces love a gentle cool hand-wash and flat drying to keep their shape. Each order arrives with a care card specific to its fibre, and baby items are made to be machine-washable.</p></div>
+          </details>
+          <details class="faq__item">
+            <summary>What yarns and fibres do you use?<span class="faq__icon" aria-hidden="true"></span></summary>
+            <div class="faq__answer"><p>Only natural and responsibly sourced fibres — organic cotton, ethically farmed merino and lambswool, and plant-dyed alpaca. No acrylics, and packaging is always plastic-free.</p></div>
+          </details>
+          <details class="faq__item">
+            <summary>What is your returns policy?<span class="faq__icon" aria-hidden="true"></span></summary>
+            <div class="faq__answer"><p>Ready-made pieces can be returned within 30 days in original condition for a full refund. Because custom commissions are made just for you, they're non-refundable — but I'll always work with you until you're delighted.</p></div>
+          </details>
+          <details class="faq__item">
+            <summary>Do you ship internationally?<span class="faq__icon" aria-hidden="true"></span></summary>
+            <div class="faq__answer"><p>Absolutely. I ship worldwide with tracked, carbon-neutral delivery, and shipping is free on orders over $150. Duties for orders outside your region are calculated at checkout.</p></div>
+          </details>
+        </div>
+      </div>
+    </section>
+
     <!-- ===== Newsletter ===== -->
     <section class="newsletter">
       <div class="container newsletter__inner reveal">
@@ -276,15 +383,15 @@
         <h4>Atelier</h4>
         <a href="#story">Our story</a>
         <a href="#process">The craft</a>
+        <a href="#custom">Custom orders</a>
         <a href="#reviews">Reviews</a>
-        <a href="#">Care guide</a>
       </div>
       <div class="footer__col">
         <h4>Help</h4>
-        <a href="#">Shipping</a>
-        <a href="#">Returns</a>
-        <a href="#">Size guide</a>
-        <a href="#">Contact</a>
+        <a href="#faq">Shipping</a>
+        <a href="#faq">Returns</a>
+        <a href="#faq">FAQ</a>
+        <a href="#custom">Contact</a>
       </div>
     </div>
     <div class="container footer__bar">

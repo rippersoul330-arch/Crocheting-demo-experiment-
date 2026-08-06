@@ -405,6 +405,55 @@
     e.target.reset();
   });
 
+  /* custom order / commission request */
+  const customForm = $("#customForm");
+  if (customForm) {
+    customForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const note = $("#customNote");
+      const required = $$("[required]", customForm);
+      let firstBad = null;
+
+      required.forEach((el) => {
+        const field = el.closest(".cfield");
+        const value = el.value.trim();
+        const emailBad = el.type === "email" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+        const bad = value === "" || emailBad;
+        if (field) field.classList.toggle("is-invalid", bad);
+        if (bad && !firstBad) firstBad = el;
+      });
+
+      if (firstBad) {
+        note.textContent = "Please fill in the highlighted fields so I can help.";
+        note.classList.remove("is-ok");
+        firstBad.focus();
+        return;
+      }
+
+      const name = $("#cfName").value.trim().split(" ")[0];
+      note.textContent = `Thank you, ${name}! I've received your request and will reply within 2 business days.`;
+      note.classList.add("is-ok");
+      toast("Custom request sent — talk soon! 💛");
+      customForm.reset();
+      $$(".cfield", customForm).forEach((f) => f.classList.remove("is-invalid"));
+    });
+
+    /* clear the invalid state as the user fixes a field */
+    customForm.addEventListener("input", (e) => {
+      const field = e.target.closest(".cfield");
+      if (field) field.classList.remove("is-invalid");
+    });
+  }
+
+  /* FAQ accordion — open one at a time */
+  $$(".faq__item").forEach((item) => {
+    item.addEventListener("toggle", () => {
+      if (item.open) {
+        $$(".faq__item").forEach((other) => { if (other !== item) other.open = false; });
+      }
+    });
+  });
+
   /* reveal already-visible statics */
   observe($$(".reveal"));
 
