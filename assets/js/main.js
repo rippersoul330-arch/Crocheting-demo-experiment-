@@ -355,8 +355,99 @@
   $("#cartClose").addEventListener("click", closeCart);
   $("#cartEmptyShop").addEventListener("click", () => { closeCart(); location.hash = "#shop"; });
   overlay.addEventListener("click", () => { closeCart(); });
-  $("#checkoutBtn").addEventListener("click", () => {
-    toast("This is a demo — no payment is taken 💛");
+  /* ---------------- checkout / reserve order (no online payment) ---------------- */
+  const checkoutModal = $("#checkoutModal");
+
+  function renderCheckoutSummary() {
+    const ids = Object.keys(cart);
+    const lines = ids.map((id) => {
+      const p = byId(id); if (!p) return "";
+      const q = cart[id];
+      return `<div class="co-line">
+        <img src="${p.img}" alt="${p.name}" />
+        <div><div class="co-line__name">${p.name}</div><div class="co-line__qty">Qty ${q} · ${money(p.price)}</div></div>
+        <span class="co-line__price">${money(p.price * q)}</span>
+      </div>`;
+    }).join("");
+    const total = cartTotal();
+    $("#checkoutSummary").innerHTML = lines + `<div class="co-total"><span>Total</span><strong>${money(total)}</strong></div>`;
+    $("#checkoutTotal").textContent = money(total);
+  }
+
+  function openCheckout() {
+    if (cartCount() === 0) { toast("Your basket is empty"); return; }
+    closeCart();
+    renderCheckoutSummary();
+    const note = $("#checkoutNote"); note.textContent = ""; note.classList.remove("is-ok");
+    checkoutModal.classList.add("is-open");
+    checkoutModal.setAttribute("aria-hidden", "false");
+    document.body.style.overflow = "hidden";
+  }
+  function closeCheckout() {
+    checkoutModal.classList.remove("is-open");
+    checkoutModal.setAttribute("aria-hidden", "true");
+    if (!drawer.classList.contains("is-open")) document.body.style.overflow = "";
+  }
+
+  $("#checkoutBtn").addEventListener("click", openCheckout);
+  $$("[data-checkout-close]").forEach((el) => el.addEventListener("click", closeCheckout));
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeCheckout(); });
+
+  $("#checkoutForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const note = $("#checkoutNote"); note.textContent = ""; note.classList.remove("is-ok");
+    const name = $("#coName").value.trim();
+    const email = $("#coEmail").value.trim();
+    if (!name || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      note.textContent = "Please enter your name and a valid email.";
+      return;
+    }
+    if (cartCount() === 0) { note.textContent = "Your basket is empty."; return; }
+
+    const checked = document.querySelector('input[name="fulfilment"]:checked');
+    const fulfilment = checked ? checked.value : "Local pickup";
+    const phone = $("#coPhone").value.trim();
+    const message = $("#coNote").value.trim();
+
+    const items = Object.keys(cart).map((id) => {
+      const p = byId(id);
+      return p ? { product_name: p.name, unit_price_cents: Math.round(p.price * 100), quantity: cart[id] } : null;
+    }).filter(Boolean);
+    const totalCents = Math.round(cartTotal() * 100);
+    const notesText = "Fulfilment: " + fulfilment +
+      (phone ? " | Phone: " + phone : "") +
+      (message ? " | Note: " + message : "");
+
+    const btn = $("#placeOrderBtn");
+    const prev = btn.innerHTML;
+    btn.disabled = true; btn.textContent = "Placing order…";
+    try {
+      if (!window.LoopIvyBackend || !window.LoopIvyBackend.createOrder) {
+        throw new Error("Order backend not connected");
+      }
+      await window.LoopIvyBackend.createOrder({
+        customer_name: name,
+        customer_email: email,
+        shipping: { method: fulfilment, phone: phone, note: message },
+        subtotal_cents: totalCents,
+        shipping_cents: 0,
+        total_cents: totalCents,
+        currency: "usd",
+        notes: notesText,
+      }, items);
+
+      cart = {}; save(); renderCart();
+      note.textContent = `Thank you, ${name.split(" ")[0]}! Your order is reserved — check your email for confirmation.`;
+      note.classList.add("is-ok");
+      toast("Order reserved — I'll be in touch! 💛");
+      $("#checkoutForm").reset();
+      setTimeout(closeCheckout, 2800);
+    } catch (err) {
+      console.warn("[LoopIvy] order failed:", err.message || err);
+      note.textContent = "Sorry, something went wrong saving your order. Please try again.";
+    } finally {
+      btn.disabled = false; btn.innerHTML = prev;
+    }
   });
 
   /* modal overlay click */

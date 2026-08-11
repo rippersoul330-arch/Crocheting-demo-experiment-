@@ -630,6 +630,40 @@ h1, h2, h3, h4 { font-family: var(--serif); font-weight: 500; line-height: 1.06;
 .qv__qty span { min-width: 30px; text-align: center; }
 
 /* ------------------------------------------------------------------ *
+ * 16b. Checkout / order modal
+ * ------------------------------------------------------------------ */
+.modal__panel--form { display: block; width: min(560px, 100%); }
+.checkout { position: relative; }
+.checkout__scroll { max-height: 90dvh; overflow-y: auto; padding: clamp(1.6rem, 3vw, 2.4rem); }
+.checkout__close { position: absolute; top: 1rem; right: 1rem; z-index: 3; background: rgba(255,253,249,.9); }
+.checkout__title { font-size: clamp(1.5rem, 3vw, 2rem); margin: .3rem 0 .5rem; }
+.checkout__intro { color: var(--espresso-2); font-size: .92rem; margin-bottom: 1.3rem; }
+
+.checkout__summary { border: 1px solid var(--line-soft); border-radius: var(--radius); overflow: hidden; margin-bottom: 1.4rem; background: var(--paper); }
+.co-line { display: flex; align-items: center; gap: .8rem; padding: .7rem .9rem; border-bottom: 1px solid var(--line-soft); }
+.co-line:last-of-type { border-bottom: none; }
+.co-line img { width: 42px; height: 52px; border-radius: 8px; object-fit: cover; background: var(--cream-2); flex-shrink: 0; }
+.co-line__name { font-size: .9rem; font-weight: 500; }
+.co-line__qty { font-size: .8rem; color: var(--espresso-2); }
+.co-line__price { margin-left: auto; font-family: var(--serif); font-weight: 600; }
+.co-total { display: flex; justify-content: space-between; align-items: center; padding: .9rem; background: var(--cream-2); font-family: var(--serif); }
+.co-total strong { font-size: 1.2rem; }
+
+.fulfil { border: none; margin: 0 0 1.2rem; padding: 0; display: grid; gap: .6rem; }
+.fulfil legend { font-size: .74rem; letter-spacing: .12em; text-transform: uppercase; color: var(--espresso-2); font-weight: 500; margin-bottom: .3rem; }
+.fulfil-opt { display: flex; align-items: flex-start; gap: .7rem; padding: .8rem 1rem; border: 1.5px solid var(--line); border-radius: 14px; cursor: pointer; transition: border-color .25s, background .25s; background: var(--paper); }
+.fulfil-opt:hover { border-color: var(--clay); }
+.fulfil-opt input { margin-top: .25rem; accent-color: var(--clay); width: 17px; height: 17px; flex-shrink: 0; }
+.fulfil-opt:has(input:checked) { border-color: var(--clay); background: var(--cream-2); }
+.fulfil-opt__body { display: flex; flex-direction: column; }
+.fulfil-opt__body b { font-family: var(--serif); font-weight: 600; }
+.fulfil-opt__body small { color: var(--espresso-2); font-size: .84rem; }
+
+.checkout__note { font-size: .88rem; min-height: 1.2em; margin: .7rem 0 .3rem; color: var(--clay-deep); }
+.checkout__note.is-ok { color: var(--sage-deep); }
+#placeOrderBtn { margin-top: .4rem; }
+
+/* ------------------------------------------------------------------ *
  * 17. Toast
  * ------------------------------------------------------------------ */
 .toast {

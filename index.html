@@ -421,8 +421,8 @@
         <strong id="cartSubtotal">$0</strong>
       </div>
       <p class="cart-drawer__ship" id="cartShip"></p>
-      <button class="btn btn--primary btn--block" id="checkoutBtn">Checkout</button>
-      <p class="cart-drawer__fine">Taxes calculated at checkout. Made-to-order pieces ship in 2–3 weeks.</p>
+      <button class="btn btn--primary btn--block" id="checkoutBtn">Reserve order</button>
+      <p class="cart-drawer__fine">No online payment — reserve now, then pay on local pickup or arrange your made-to-order piece.</p>
     </footer>
   </aside>
 
@@ -430,6 +430,60 @@
   <div class="modal" id="quickview" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Product quick view">
     <div class="modal__overlay" data-close></div>
     <div class="modal__panel" id="quickviewPanel"><!-- injected --></div>
+  </div>
+
+  <!-- ===== Checkout / order modal (no online payment) ===== -->
+  <div class="modal" id="checkoutModal" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Reserve your order">
+    <div class="modal__overlay" data-checkout-close></div>
+    <div class="modal__panel modal__panel--form checkout">
+      <button class="icon-btn checkout__close" data-checkout-close aria-label="Close">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
+      </button>
+      <div class="checkout__scroll">
+        <span class="eyebrow">Almost there</span>
+        <h3 class="checkout__title">Reserve your order</h3>
+        <p class="checkout__intro">No online payment needed — reserve your pieces and I'll email you personally to confirm the details and arrange payment.</p>
+
+        <div class="checkout__summary" id="checkoutSummary"><!-- injected --></div>
+
+        <form id="checkoutForm" novalidate>
+          <fieldset class="fulfil">
+            <legend>How would you like to receive your order?</legend>
+            <label class="fulfil-opt">
+              <input type="radio" name="fulfilment" value="Local pickup" checked />
+              <span class="fulfil-opt__body"><b>Local pickup</b><small>Collect in person and pay on collection.</small></span>
+            </label>
+            <label class="fulfil-opt">
+              <input type="radio" name="fulfilment" value="Made to order" />
+              <span class="fulfil-opt__body"><b>Made to order</b><small>I'll craft it, then we arrange handover or delivery together.</small></span>
+            </label>
+          </fieldset>
+
+          <div class="cform-grid">
+            <div class="cfield">
+              <label for="coName">Your name</label>
+              <input type="text" id="coName" name="name" placeholder="Jane Doe" required />
+            </div>
+            <div class="cfield">
+              <label for="coEmail">Email</label>
+              <input type="email" id="coEmail" name="email" placeholder="you@example.com" required />
+            </div>
+            <div class="cfield cfield--full">
+              <label for="coPhone">Phone (optional)</label>
+              <input type="tel" id="coPhone" name="phone" placeholder="For quick coordination" />
+            </div>
+            <div class="cfield cfield--full">
+              <label for="coNote">Note (optional)</label>
+              <textarea id="coNote" name="note" rows="3" placeholder="Colours, timing, pickup preferences…"></textarea>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn--primary btn--block" id="placeOrderBtn">Place order · <span id="checkoutTotal">$0</span></button>
+          <p class="checkout__note" id="checkoutNote" role="status"></p>
+          <p class="cart-drawer__fine">No payment is taken online. You'll receive an email to confirm your order.</p>
+        </form>
+      </div>
+    </div>
   </div>
 
   <!-- ===== Toast ===== -->

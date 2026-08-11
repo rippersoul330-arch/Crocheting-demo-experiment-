@@ -97,6 +97,41 @@
         .upsert({ email }, { onConflict: "email", ignoreDuplicates: true });
       if (error) throw error;
     },
+
+    /* Save a reserve/pickup order (no online payment).
+       We generate the order id client-side so we can link order_items
+       without needing read-back permission (blocked for the public by RLS). */
+    async createOrder(order, items) {
+      const orderId =
+        (window.crypto && window.crypto.randomUUID && window.crypto.randomUUID()) ||
+        ("o-" + Date.now() + "-" + Math.random().toString(16).slice(2));
+
+      const { error: e1 } = await client.from("orders").insert({
+        id: orderId,
+        customer_name: order.customer_name,
+        customer_email: order.customer_email,
+        shipping: order.shipping || null,
+        subtotal_cents: order.subtotal_cents,
+        shipping_cents: order.shipping_cents || 0,
+        total_cents: order.total_cents,
+        currency: order.currency || "usd",
+        status: "pending",
+        notes: order.notes || null,
+      });
+      if (e1) throw e1;
+
+      const rows = (items || []).map((it) => ({
+        order_id: orderId,
+        product_name: it.product_name,
+        unit_price_cents: it.unit_price_cents,
+        quantity: it.quantity,
+      }));
+      if (rows.length) {
+        const { error: e2 } = await client.from("order_items").insert(rows);
+        if (e2) throw e2;
+      }
+      return orderId;
+    },
   };
 
   loadProducts();
