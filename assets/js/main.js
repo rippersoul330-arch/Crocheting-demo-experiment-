@@ -7,10 +7,10 @@
   const { CATEGORIES, REVIEWS, buildScene } = window.LoopIvy;
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
-  const money = (n) => "$" + n.toLocaleString("en-US");
+  const money = (n) => "₹" + Number(n).toLocaleString("en-IN");
   const stars = (r) => "★★★★★".slice(0, Math.round(r)) + "☆☆☆☆☆".slice(0, 5 - Math.round(r));
   const byId = (id) => PRODUCTS.find((p) => p.id === id);
-  const FREE_SHIP = 150;
+  const FREE_SHIP = 1500;
 
   /* ---------------- state ---------------- */
   let cart = load("loopivy_cart", {});      // { id: qty }
@@ -212,7 +212,7 @@
     $("#cartSubtotal").textContent = money(total);
     const ship = $("#cartShip");
     if (total >= FREE_SHIP) {
-      ship.innerHTML = "✓ You've unlocked <b>free carbon-neutral shipping</b>";
+      ship.innerHTML = "✓ You've unlocked <b>free shipping across India</b>";
     } else {
       ship.innerHTML = `Add <b>${money(FREE_SHIP - total)}</b> more for free shipping`;
     }
@@ -376,10 +376,21 @@
     $("#checkoutTotal").textContent = money(total);
   }
 
+  function selectedFulfilment() {
+    const checked = document.querySelector('input[name="fulfilment"]:checked');
+    return checked ? checked.value : "Ship across India";
+  }
+  function toggleShipFields() {
+    const shipping = selectedFulfilment() === "Ship across India";
+    const el = $("#shipFields");
+    if (el) el.classList.toggle("is-hidden", !shipping);
+  }
+
   function openCheckout() {
     if (cartCount() === 0) { toast("Your basket is empty"); return; }
     closeCart();
     renderCheckoutSummary();
+    toggleShipFields();
     const note = $("#checkoutNote"); note.textContent = ""; note.classList.remove("is-ok");
     checkoutModal.classList.add("is-open");
     checkoutModal.setAttribute("aria-hidden", "false");
@@ -392,6 +403,7 @@
   }
 
   $("#checkoutBtn").addEventListener("click", openCheckout);
+  $$('input[name="fulfilment"]').forEach((r) => r.addEventListener("change", toggleShipFields));
   $$("[data-checkout-close]").forEach((el) => el.addEventListener("click", closeCheckout));
   document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeCheckout(); });
 
@@ -406,18 +418,37 @@
     }
     if (cartCount() === 0) { note.textContent = "Your basket is empty."; return; }
 
-    const checked = document.querySelector('input[name="fulfilment"]:checked');
-    const fulfilment = checked ? checked.value : "Local pickup";
+    const fulfilment = selectedFulfilment();
     const phone = $("#coPhone").value.trim();
     const message = $("#coNote").value.trim();
+    const address = $("#coAddress").value.trim();
+    const city = $("#coCity").value.trim();
+    const state = $("#coState").value.trim();
+    const pincode = $("#coPin").value.trim();
+
+    // Shipping requires a delivery address + a valid 6-digit PIN
+    if (fulfilment === "Ship across India") {
+      if (!address || !city || !state || !pincode) {
+        note.textContent = "Please fill in your full delivery address for shipping.";
+        return;
+      }
+      if (!/^\d{6}$/.test(pincode)) {
+        note.textContent = "Please enter a valid 6-digit PIN code.";
+        return;
+      }
+    }
 
     const items = Object.keys(cart).map((id) => {
       const p = byId(id);
       return p ? { product_name: p.name, unit_price_cents: Math.round(p.price * 100), quantity: cart[id] } : null;
     }).filter(Boolean);
     const totalCents = Math.round(cartTotal() * 100);
+    const addressText = fulfilment === "Ship across India"
+      ? ` | Ship to: ${address}, ${city}, ${state} - ${pincode}`
+      : "";
     const notesText = "Fulfilment: " + fulfilment +
       (phone ? " | Phone: " + phone : "") +
+      addressText +
       (message ? " | Note: " + message : "");
 
     const btn = $("#placeOrderBtn");
@@ -430,11 +461,19 @@
       await window.LoopIvyBackend.createOrder({
         customer_name: name,
         customer_email: email,
-        shipping: { method: fulfilment, phone: phone, note: message },
+        shipping: {
+          method: fulfilment,
+          phone: phone,
+          note: message,
+          address: address || null,
+          city: city || null,
+          state: state || null,
+          pincode: pincode || null,
+        },
         subtotal_cents: totalCents,
         shipping_cents: 0,
         total_cents: totalCents,
-        currency: "usd",
+        currency: "inr",
         notes: notesText,
       }, items);
 

@@ -126,7 +126,7 @@
         subtotal_cents: order.subtotal_cents,
         shipping_cents: order.shipping_cents || 0,
         total_cents: order.total_cents,
-        currency: order.currency || "usd",
+        currency: order.currency || "inr",
         status: "pending",
         notes: order.notes || null,
       });
