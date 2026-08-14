@@ -661,6 +661,8 @@ h1, h2, h3, h4 { font-family: var(--serif); font-weight: 500; line-height: 1.06;
 .fulfil-opt__body b { font-family: var(--serif); font-weight: 600; }
 .fulfil-opt__body small { color: var(--espresso-2); font-size: .84rem; }
 
+.ship-fields { margin-top: .2rem; }
+.ship-fields.is-hidden { display: none; }
 .checkout__note { font-size: .88rem; min-height: 1.2em; margin: .7rem 0 .3rem; color: var(--clay-deep); }
 .checkout__note.is-ok { color: var(--sage-deep); }
 #placeOrderBtn { margin-top: .4rem; }
