@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Loop &amp; Ivy — Sell with us</title>
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Jost:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/admin.css" />
+</head>
+<body>
+
+  <!-- ============ AUTH (login / signup) ============ -->
+  <div class="login" id="loginScreen">
+    <div class="login__card">
+      <div class="login__brand">
+        <span class="mark">L</span>
+        <h1>Sell with Loop &amp; Ivy</h1>
+        <p id="authSub">Sign in to your seller account</p>
+      </div>
+
+      <!-- LOGIN -->
+      <form id="loginForm" novalidate>
+        <div class="field">
+          <label for="loginEmail">Email</label>
+          <input type="email" id="loginEmail" autocomplete="username" required />
+        </div>
+        <div class="field">
+          <label for="loginPassword">Password</label>
+          <input type="password" id="loginPassword" autocomplete="current-password" required />
+        </div>
+        <button type="submit" class="btn btn--primary btn--block" id="loginBtn">Sign in</button>
+        <p class="note" id="loginNote" role="status"></p>
+        <p class="auth-switch">New here? <a href="#" id="showSignup">Create a seller account</a></p>
+      </form>
+
+      <!-- SIGNUP -->
+      <form id="signupForm" novalidate hidden>
+        <div class="field">
+          <label for="suShop">Shop name</label>
+          <input type="text" id="suShop" placeholder="e.g. Cosy Loops by Mia" required />
+        </div>
+        <div class="field">
+          <label for="suEmail">Email</label>
+          <input type="email" id="suEmail" autocomplete="username" required />
+        </div>
+        <div class="field">
+          <label for="suPassword">Password</label>
+          <input type="password" id="suPassword" autocomplete="new-password" placeholder="At least 6 characters" required />
+        </div>
+        <button type="submit" class="btn btn--primary btn--block" id="signupBtn">Create account</button>
+        <p class="note" id="signupNote" role="status"></p>
+        <p class="auth-switch">Already have an account? <a href="#" id="showLogin">Sign in</a></p>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============ SELLER APP ============ -->
+  <div class="app" id="app">
+    <header class="topbar">
+      <div class="topbar__brand"><span class="mark">L</span> Seller Studio</div>
+      <div class="topbar__right">
+        <span class="topbar__user" id="userEmail"></span>
+        <a class="btn btn--ghost btn--sm" href="index.html" target="_blank" rel="noopener">View shop ↗</a>
+        <button class="btn btn--ghost btn--sm" id="logoutBtn">Sign out</button>
+      </div>
+    </header>
+
+    <main class="wrap">
+      <nav class="tabs" id="tabs">
+        <button class="tab is-active" data-tab="products">My Products <span class="pill" id="countProducts">0</span></button>
+        <button class="tab" data-tab="shop">My Shop</button>
+      </nav>
+
+      <!-- PRODUCTS -->
+      <section class="panel is-active" id="panel-products">
+        <div class="panel__head">
+          <div>
+            <h2>My Products</h2>
+            <p>Add and manage the crochet pieces you sell. They appear in the shop with your shop name.</p>
+          </div>
+          <button class="btn btn--primary" id="addProductBtn">+ New product</button>
+        </div>
+
+        <div class="notice" id="profileNotice" hidden>
+          <b>Set up your shop first.</b> Add your shop name in the <a href="#" data-goto="shop">My Shop</a> tab so buyers know who made each piece.
+        </div>
+
+        <div class="card-box">
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr><th>Product</th><th>Category</th><th>Price</th><th>Tag</th><th>Status</th><th></th></tr>
+              </thead>
+              <tbody id="productsBody"></tbody>
+            </table>
+          </div>
+          <div class="loading" id="productsLoading"><div class="spinner"></div>Loading your products…</div>
+          <div class="empty" id="productsEmpty" hidden>No products yet. Click “New product” to list your first piece.</div>
+        </div>
+      </section>
+
+      <!-- SHOP PROFILE -->
+      <section class="panel" id="panel-shop">
+        <div class="panel__head">
+          <div>
+            <h2>My Shop</h2>
+            <p>This is how buyers see you across the marketplace.</p>
+          </div>
+        </div>
+        <div class="card-box" style="padding:1.4rem;">
+          <form id="shopForm" novalidate>
+            <div class="form-grid">
+              <div class="field col-full">
+                <label for="shopName">Shop name</label>
+                <input type="text" id="shopName" placeholder="e.g. Cosy Loops by Mia" required />
+              </div>
+              <div class="field">
+                <label for="shopLocation">Location (optional)</label>
+                <input type="text" id="shopLocation" placeholder="e.g. Portland, OR" />
+              </div>
+              <div class="field">
+                <label for="shopEmail">Contact email (optional)</label>
+                <input type="email" id="shopEmail" placeholder="hello@yourshop.com" />
+              </div>
+              <div class="field col-full">
+                <label for="shopBio">About your shop (optional)</label>
+                <textarea id="shopBio" rows="3" placeholder="A sentence or two about you and your craft…"></textarea>
+              </div>
+              <div class="field col-full">
+                <label for="shopAvatar">Logo / photo URL (optional)</label>
+                <input type="text" id="shopAvatar" placeholder="https://…" />
+              </div>
+            </div>
+            <div class="modal__foot" style="border:none;padding-top:.6rem;justify-content:flex-start;">
+              <button type="submit" class="btn btn--primary" id="saveShopBtn">Save shop</button>
+              <p class="note" id="shopNote" role="status" style="margin:0 0 0 1rem;"></p>
+            </div>
+          </form>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- ============ PRODUCT EDITOR MODAL ============ -->
+  <div class="modal" id="productModal" aria-hidden="true">
+    <div class="modal__overlay" data-close></div>
+    <div class="modal__panel" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modal__head">
+        <h3 id="modalTitle">New product</h3>
+        <button class="modal__close" data-close aria-label="Close">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
+        </button>
+      </div>
+      <form id="productForm" novalidate>
+        <input type="hidden" id="p_id" />
+        <div class="form-grid">
+          <div class="preview-row">
+            <img id="p_preview" alt="Preview" />
+            <span>Live preview — pick a motif &amp; colours for the illustrated art, or paste a real photo URL below to use your own photo.</span>
+          </div>
+
+          <div class="field">
+            <label for="p_name">Name</label>
+            <input type="text" id="p_name" required />
+          </div>
+          <div class="field">
+            <label for="p_category">Category</label>
+            <select id="p_category" required>
+              <option value="blankets">Blankets &amp; Throws</option>
+              <option value="sweaters">Sweaters</option>
+              <option value="bags">Bags</option>
+              <option value="accessories">Accessories</option>
+              <option value="home">Home</option>
+              <option value="baby">Baby</option>
+              <option value="amigurumi">Amigurumi</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="p_motif">Art motif</label>
+            <select id="p_motif">
+              <option value="blanket">Blanket</option>
+              <option value="sweater">Sweater</option>
+              <option value="bag">Bag</option>
+              <option value="hat">Hat</option>
+              <option value="toy">Toy</option>
+              <option value="plant">Plant</option>
+              <option value="coaster">Coaster</option>
+              <option value="scarf">Scarf</option>
+              <option value="cushion">Cushion</option>
+              <option value="booties">Booties</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="p_image">Photo URL (optional)</label>
+            <input type="text" id="p_image" placeholder="https://…" />
+          </div>
+
+          <div class="col-3">
+            <div class="field">
+              <label>Background</label>
+              <div class="color-field"><input type="color" id="p_bg" value="#c07a52" /><input type="text" id="p_bg_t" /></div>
+            </div>
+            <div class="field">
+              <label>Yarn</label>
+              <div class="color-field"><input type="color" id="p_yarn" value="#f4e7d6" /><input type="text" id="p_yarn_t" /></div>
+            </div>
+            <div class="field">
+              <label>Accent</label>
+              <div class="color-field"><input type="color" id="p_accent" value="#8f4c2e" /><input type="text" id="p_accent_t" /></div>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="p_price">Price ($)</label>
+            <input type="number" id="p_price" min="0" step="0.01" required />
+          </div>
+          <div class="field">
+            <label for="p_compare">Compare-at / was ($, optional)</label>
+            <input type="number" id="p_compare" min="0" step="0.01" />
+          </div>
+
+          <div class="field">
+            <label for="p_tag">Tag (optional)</label>
+            <input type="text" id="p_tag" placeholder="New, Bestseller, Sale…" />
+          </div>
+          <div class="field">
+            <label for="p_stock">Stock (blank = made to order)</label>
+            <input type="number" id="p_stock" min="0" step="1" />
+          </div>
+
+          <div class="field col-full">
+            <label for="p_blurb">Description</label>
+            <textarea id="p_blurb"></textarea>
+          </div>
+          <div class="field col-full">
+            <label for="p_materials">Details / materials (one per line)</label>
+            <textarea id="p_materials" placeholder="100% organic cotton&#10;38 x 40 cm&#10;Made to order"></textarea>
+          </div>
+
+          <div class="col-full">
+            <label class="checkline"><input type="checkbox" id="p_active" checked /> Active (visible in the shop)</label>
+          </div>
+        </div>
+
+        <div class="modal__foot">
+          <button type="button" class="btn btn--danger" id="deleteProductBtn" hidden>Delete</button>
+          <span class="spacer"></span>
+          <button type="button" class="btn btn--ghost" data-close>Cancel</button>
+          <button type="submit" class="btn btn--primary" id="saveProductBtn">Save product</button>
+        </div>
+        <p class="note" id="productNote" role="status"></p>
+      </form>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" hidden></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/js/supabase-config.js"></script>
+  <script src="assets/js/products.js"></script>
+  <script src="assets/js/seller.js"></script>
+</body>
+</html>
