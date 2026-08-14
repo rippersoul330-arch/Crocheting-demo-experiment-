@@ -59,6 +59,7 @@
         <div class="card__body">
           <span class="card__cat">${catLabel(p.category)}</span>
           <h3 class="card__name">${p.name}</h3>
+          ${p.maker ? `<span class="card__maker">by ${p.maker}</span>` : ""}
           <div class="card__rating"><span class="card__stars">${stars(p.rating)}</span> ${p.rating.toFixed(1)} · ${p.reviews}</div>
           <div class="card__foot">
             <span class="card__price">${onsale ? `<s>${money(p.old)}</s>` : ""}${money(p.price)}</span>
@@ -249,6 +250,7 @@
       <div class="qv__body">
         <span class="qv__cat">${catLabel(p.category)}</span>
         <h3 class="qv__name">${p.name}</h3>
+        ${p.maker ? `<p class="qv__maker">by ${p.maker}</p>` : ""}
         <div class="qv__rating"><span class="card__stars">${stars(p.rating)}</span> ${p.rating.toFixed(1)} · ${p.reviews} reviews</div>
         <div class="qv__price">${onsale ? `<s>${money(p.old)}</s>` : ""}${money(p.price)}</div>
         <p class="qv__desc">${p.blurb}</p>

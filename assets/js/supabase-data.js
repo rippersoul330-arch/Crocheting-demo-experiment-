@@ -44,6 +44,7 @@
       reviews: row.review_count || 0,
       blurb: row.blurb || "",
       materials: Array.isArray(row.materials) ? row.materials : [],
+      maker: row.sellers && row.sellers.shop_name ? row.sellers.shop_name : undefined,
     };
     // Use a real photo if one was uploaded, otherwise the hand-drawn SVG art.
     p.img =
@@ -56,11 +57,22 @@
 
   async function loadProducts() {
     try {
-      const { data, error } = await client
+      // Try to include the maker's shop name (works once the marketplace
+      // migration has added the sellers relationship). Fall back to a plain
+      // query if that relationship doesn't exist yet.
+      let { data, error } = await client
         .from("products")
-        .select("*")
+        .select("*, sellers(shop_name)")
         .eq("active", true)
         .order("sort_order", { ascending: true });
+
+      if (error) {
+        ({ data, error } = await client
+          .from("products")
+          .select("*")
+          .eq("active", true)
+          .order("sort_order", { ascending: true }));
+      }
 
       if (error) throw error;
       if (!data || !data.length) {

@@ -91,6 +91,12 @@ img { max-width: 100%; display: block; }
 .note.err { color: var(--danger); }
 .note.ok { color: var(--ok); }
 
+.auth-switch { text-align: center; font-size: .86rem; color: var(--espresso-2); margin-top: 1.1rem; }
+.auth-switch a { font-weight: 500; }
+
+.notice { background: rgba(192,122,82,.1); border: 1px solid var(--line); color: var(--espresso); padding: .9rem 1.1rem; border-radius: var(--radius); font-size: .9rem; margin-bottom: 1.2rem; }
+.notice a { font-weight: 500; }
+
 /* ---------- app shell ---------- */
 .app { display: none; min-height: 100vh; }
 .app.is-auth { display: block; }
