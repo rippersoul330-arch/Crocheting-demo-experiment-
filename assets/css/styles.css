@@ -187,6 +187,14 @@ h1, h2, h3, h4 { font-family: var(--serif); font-weight: 500; line-height: 1.06;
 .icon-btn svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
 .icon-btn:hover { background: var(--cream-2); transform: translateY(-1px); }
 .cart-btn { position: relative; }
+.wish-btn { position: relative; }
+.wish-item__add {
+  margin-top: .55rem; font-size: .76rem; letter-spacing: .04em;
+  padding: .45em 1em; border: 1.5px solid var(--line); border-radius: 100px;
+  color: var(--espresso); background: var(--paper); transition: border-color .2s, color .2s, background .2s;
+}
+.wish-item__add:hover { border-color: var(--clay); color: var(--clay-deep); background: var(--cream-2); }
+.wish-item .cart-item__price s { color: var(--espresso-2); font-weight: 400; font-size: .82em; margin-right: .3rem; }
 .cart-badge {
   position: absolute; top: 4px; right: 2px;
   min-width: 19px; height: 19px; padding: 0 5px;

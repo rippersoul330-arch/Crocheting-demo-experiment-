@@ -66,6 +66,10 @@
         <button class="icon-btn" id="searchBtn" aria-label="Search" title="Search">
           <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg>
         </button>
+        <button class="icon-btn wish-btn" id="wishBtn" aria-label="Open wishlist" title="Wishlist">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.5-9.5-9C1 8 2.5 4.5 6 4.5c2 0 3.2 1.2 4 2.4.8-1.2 2-2.4 4-2.4 3.5 0 5 3.5 3.5 6.5C19 15.5 12 20 12 20z"/></svg>
+          <span class="cart-badge" id="wishBadge" hidden>0</span>
+        </button>
         <button class="icon-btn cart-btn" id="cartBtn" aria-label="Open cart" title="Cart">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 7h12l-1.2 12.1a2 2 0 0 1-2 1.9H9.2a2 2 0 0 1-2-1.9L6 7z"/><path d="M9 7a3 3 0 0 1 6 0"/></svg>
           <span class="cart-badge" id="cartBadge" hidden>0</span>
@@ -454,6 +458,22 @@
       <button class="btn btn--primary btn--block" id="checkoutBtn">Reserve order</button>
       <p class="cart-drawer__fine">No online payment — reserve now, then pay on local pickup or arrange your made-to-order piece.</p>
     </footer>
+  </aside>
+
+  <!-- ===== Wishlist drawer ===== -->
+  <aside class="cart-drawer" id="wishDrawer" aria-hidden="true" aria-label="Wishlist">
+    <header class="cart-drawer__head">
+      <h3>Your wishlist</h3>
+      <button class="icon-btn" id="wishClose" aria-label="Close wishlist">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
+      </button>
+    </header>
+    <div class="cart-drawer__body" id="wishItems"><!-- injected --></div>
+    <div class="cart-empty" id="wishEmpty">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.5-9.5-9C1 8 2.5 4.5 6 4.5c2 0 3.2 1.2 4 2.4.8-1.2 2-2.4 4-2.4 3.5 0 5 3.5 3.5 6.5C19 15.5 12 20 12 20z"/></svg>
+      <p>Your wishlist is empty. Tap the heart on any piece to save it here.</p>
+      <button class="btn btn--dark" id="wishEmptyShop">Find something you love</button>
+    </div>
   </aside>
 
   <!-- ===== Quick-view modal ===== -->
