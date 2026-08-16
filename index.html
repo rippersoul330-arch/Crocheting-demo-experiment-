@@ -54,8 +54,8 @@
         <a href="#shop">Shop</a>
         <a href="#custom">Custom Orders</a>
         <a href="#story">Our Story</a>
-        <a href="#process">The Craft</a>
         <a href="#faq">FAQ</a>
+        <a href="seller.html" class="nav__sell">Sell with us</a>
       </nav>
 
       <div class="header__actions">
@@ -338,6 +338,21 @@
       </div>
     </section>
 
+    <!-- ===== Become a seller ===== -->
+    <section class="sellcta" id="sell">
+      <div class="container sellcta__inner reveal">
+        <div class="sellcta__text">
+          <span class="eyebrow">For makers</span>
+          <h2>Sell your crochet with us</h2>
+          <p>Are you a crocheter? Open your own shop on Loop &amp; Ivy, list your handmade pieces, and reach buyers across India — you keep <strong>100% of every sale</strong> while we're getting started.</p>
+        </div>
+        <div class="sellcta__actions">
+          <a href="seller.html" class="btn btn--primary">Start selling</a>
+          <span class="sellcta__note">Free to join · You ship your own orders</span>
+        </div>
+      </div>
+    </section>
+
     <!-- ===== Newsletter ===== -->
     <section class="newsletter">
       <div class="container newsletter__inner reveal">
@@ -530,6 +545,8 @@
 
   <!-- Supabase client (loaded from CDN, no build step) -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Razorpay Checkout (opens the secure payment popup) -->
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
   <script src="assets/js/supabase-config.js"></script>
   <script src="assets/js/products.js"></script>
   <script src="assets/js/main.js"></script>

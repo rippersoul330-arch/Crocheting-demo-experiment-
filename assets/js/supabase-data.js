@@ -118,7 +118,7 @@
         (window.crypto && window.crypto.randomUUID && window.crypto.randomUUID()) ||
         ("o-" + Date.now() + "-" + Math.random().toString(16).slice(2));
 
-      const { error: e1 } = await client.from("orders").insert({
+      const row = {
         id: orderId,
         customer_name: order.customer_name,
         customer_email: order.customer_email,
@@ -129,7 +129,11 @@
         currency: order.currency || "inr",
         status: "pending",
         notes: order.notes || null,
-      });
+      };
+      // link a Razorpay order so the webhook can mark it paid (online payments)
+      if (order.razorpay_order_id) row.razorpay_order_id = order.razorpay_order_id;
+
+      const { error: e1 } = await client.from("orders").insert(row);
       if (e1) throw e1;
 
       const rows = (items || []).map((it) => ({
