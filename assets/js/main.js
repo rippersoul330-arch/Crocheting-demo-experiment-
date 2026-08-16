@@ -200,8 +200,20 @@
   const overlay = $("#overlay");
   const wishDrawer = $("#wishDrawer");
 
-  function cartCount() { return Object.values(cart).reduce((a, b) => a + b, 0); }
-  function cartTotal() { return Object.entries(cart).reduce((sum, [id, q]) => sum + (byId(id)?.price || 0) * q, 0); }
+  // Only count items whose product still exists (ignore stale localStorage ids).
+  function validCartIds() { return Object.keys(cart).filter((id) => byId(id)); }
+  function cartCount() { return validCartIds().reduce((a, id) => a + cart[id], 0); }
+  function cartTotal() { return validCartIds().reduce((sum, id) => sum + byId(id).price * cart[id], 0); }
+
+  // Drop cart/wishlist entries for products that no longer exist (e.g. old demo
+  // ids after real Supabase products load, or deleted/hidden products).
+  function pruneStaleItems() {
+    let changed = false;
+    Object.keys(cart).forEach((id) => { if (!byId(id)) { delete cart[id]; changed = true; } });
+    const before = wish.length;
+    wish = wish.filter((id) => byId(id));
+    if (changed || wish.length !== before) save();
+  }
 
   function addToCart(id, qty = 1) {
     cart[id] = (cart[id] || 0) + qty;
@@ -223,7 +235,7 @@
   }
 
   function renderCart() {
-    const ids = Object.keys(cart);
+    const ids = validCartIds();
     const body = $("#cartItems");
     const empty = $("#cartEmpty");
     const foot = $("#cartFoot");
@@ -700,11 +712,13 @@
   /* re-render when live products arrive from Supabase */
   document.addEventListener("loopivy:products", (e) => {
     PRODUCTS = (e.detail && e.detail.length ? e.detail : window.LoopIvy.PRODUCTS);
+    pruneStaleItems();          // clear any leftover ids that don't match real products
     renderFeatured();
     renderFilters();
     renderSellerBanner();
     renderGrid();
     renderCart();
+    renderWish();
     applyDeepLinks();
   });
 
