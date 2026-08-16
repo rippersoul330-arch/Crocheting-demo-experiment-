@@ -141,6 +141,19 @@
             </div>
           </form>
         </div>
+
+        <!-- Shareable shop link -->
+        <div class="card-box" id="shareBox" style="padding:1.4rem;margin-top:1.2rem;" hidden>
+          <h3 style="margin:0 0 .3rem;font-family:var(--serif);font-size:1.15rem;color:var(--espresso);">Your shop link</h3>
+          <p style="margin:0 0 1rem;color:var(--espresso-2);font-size:.92rem;">
+            Share this link on Instagram, with a content creator, or anywhere — buyers land straight on <b>your</b> storefront with only your products.
+          </p>
+          <div class="share-row">
+            <input type="text" id="shopLinkInput" readonly aria-label="Your shop link" />
+            <button type="button" class="btn btn--primary" id="copyShopLink">Copy link</button>
+          </div>
+          <p class="note" id="shopLinkNote" role="status" style="margin:.7rem 0 0;"></p>
+        </div>
       </section>
     </main>
   </div>

@@ -23,6 +23,30 @@
   const esc = (s) => String(s == null ? "" : s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
   const slugify = (s) => s.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
   const rand = () => Math.random().toString(36).slice(2, 7);
+  // Must match the storefront's seller matcher in main.js EXACTLY (apostrophes dropped).
+  const shopHandle = (s) => String(s || "").toLowerCase().trim()
+    .replace(/['’]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+  // Build a shareable link that points at the shop (index) with a query param.
+  function shopUrl(param, value) {
+    const url = new URL("./", location.href); // same folder as seller.html → the shop root
+    url.search = "?" + param + "=" + encodeURIComponent(value);
+    return url.href;
+  }
+  async function copyText(text) {
+    try {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } catch (e) {
+      // fallback for browsers/contexts without the async clipboard API
+      const ta = document.createElement("textarea");
+      ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+      document.body.appendChild(ta); ta.select();
+      let ok = false;
+      try { ok = document.execCommand("copy"); } catch (_) { ok = false; }
+      document.body.removeChild(ta);
+      return ok;
+    }
+  }
   const CAT_LABELS = { blankets: "Blankets", sweaters: "Sweaters", bags: "Bags", accessories: "Accessories", home: "Home", baby: "Baby", amigurumi: "Amigurumi" };
 
   let toastTimer;
@@ -143,11 +167,23 @@
       await saveProfile(meta.shop_name, "", currentUser.email || "", "", "");
     }
     updateProfileNotice();
+    renderShopLink();
   }
 
   function updateProfileNotice() {
     const needs = !sellerProfile || !sellerProfile.shop_name;
     $("#profileNotice").hidden = !needs;
+  }
+
+  // Show the seller's personal shop link once they have a shop name.
+  function renderShopLink() {
+    const box = $("#shareBox");
+    if (!box) return;
+    const name = (sellerProfile && sellerProfile.shop_name) || $("#shopName").value.trim();
+    const handle = shopHandle(name);
+    if (!handle) { box.hidden = true; return; }
+    box.hidden = false;
+    $("#shopLinkInput").value = shopUrl("seller", handle);
   }
 
   async function saveProfile(shop_name, location, contact_email, bio, avatar_url) {
@@ -176,11 +212,30 @@
       await saveProfile(shop, $("#shopLocation").value.trim(), $("#shopEmail").value.trim(), $("#shopBio").value.trim(), $("#shopAvatar").value.trim());
       note.textContent = "Shop saved!"; note.classList.add("ok");
       toast("Shop details saved");
+      renderShopLink();
     } catch (err) {
       note.textContent = err.message || "Could not save shop."; note.classList.add("err");
     } finally {
       btn.disabled = false; btn.textContent = "Save shop";
     }
+  });
+
+  // live-update the shareable link as the shop name is typed
+  $("#shopName").addEventListener("input", renderShopLink);
+
+  // copy the shop link to the clipboard
+  $("#copyShopLink").addEventListener("click", async () => {
+    const note = $("#shopLinkNote");
+    const ok = await copyText($("#shopLinkInput").value);
+    if (ok) {
+      note.textContent = "Link copied — paste it anywhere to share your shop!";
+      note.className = "note ok";
+      toast("Shop link copied");
+    } else {
+      note.textContent = "Couldn't copy automatically — select the link above and copy it.";
+      note.className = "note err";
+    }
+    setTimeout(() => { note.textContent = ""; note.className = "note"; }, 3500);
   });
 
   /* =====================================================================
@@ -206,7 +261,7 @@
         <td>${money(p.price_cents)}${p.compare_at_cents ? ` <s style="color:var(--espresso-2)">${money(p.compare_at_cents)}</s>` : ""}</td>
         <td>${p.tag ? `<span class="badge badge--tag">${esc(p.tag)}</span>` : "—"}</td>
         <td>${p.active ? '<span class="badge badge--on">Active</span>' : '<span class="badge badge--off">Hidden</span>'}</td>
-        <td><div class="row-actions"><button class="btn btn--ghost btn--sm" data-edit="${p.id}">Edit</button></div></td>
+        <td><div class="row-actions"><button class="btn btn--ghost btn--sm" data-copylink="${esc(p.slug)}" title="Copy a link that opens this product">Copy link</button><button class="btn btn--ghost btn--sm" data-edit="${p.id}">Edit</button></div></td>
       </tr>`;
     }).join("");
   }
@@ -312,6 +367,13 @@
     openModal(null);
   });
   document.addEventListener("click", (e) => {
+    const cp = e.target.closest("[data-copylink]");
+    if (cp) {
+      copyText(shopUrl("product", cp.dataset.copylink)).then((ok) =>
+        toast(ok ? "Product link copied" : "Couldn't copy the link", !ok)
+      );
+      return;
+    }
     const edit = e.target.closest("[data-edit]");
     if (edit) { openModal(productsCache.find((x) => x.id === edit.dataset.edit)); return; }
     if (e.target.closest("[data-close]")) closeModal();
