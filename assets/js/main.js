@@ -198,6 +198,7 @@
      ===================================================================== */
   const drawer = $("#cartDrawer");
   const overlay = $("#overlay");
+  const wishDrawer = $("#wishDrawer");
 
   function cartCount() { return Object.values(cart).reduce((a, b) => a + b, 0); }
   function cartTotal() { return Object.entries(cart).reduce((sum, [id, q]) => sum + (byId(id)?.price || 0) * q, 0); }
@@ -272,6 +273,7 @@
   }
 
   function openCart() {
+    closeWish();
     overlay.hidden = false;
     drawer.classList.add("is-open");
     drawer.setAttribute("aria-hidden", "false");
@@ -280,9 +282,66 @@
   function closeCart() {
     drawer.classList.remove("is-open");
     drawer.setAttribute("aria-hidden", "true");
-    if ($("#quickview").classList.contains("is-open")) return;
+    if ($("#quickview").classList.contains("is-open") || wishDrawer.classList.contains("is-open")) return;
     overlay.hidden = true;
     document.body.style.overflow = "";
+  }
+
+  /* =====================================================================
+     Wishlist drawer
+     ===================================================================== */
+  function bumpWishBadge() {
+    const badge = $("#wishBadge");
+    const n = wish.length;
+    badge.textContent = n;
+    badge.hidden = n === 0;
+    if (n > 0) { badge.style.animation = "none"; void badge.offsetWidth; badge.style.animation = ""; }
+  }
+
+  function renderWish() {
+    const body = $("#wishItems");
+    const empty = $("#wishEmpty");
+    bumpWishBadge();
+    const ids = wish.filter((id) => byId(id));   // only items that still exist
+    if (ids.length === 0) { body.innerHTML = ""; empty.hidden = false; return; }
+    empty.hidden = true;
+    body.innerHTML = ids.map((id) => {
+      const p = byId(id);
+      const onsale = p.old && p.old > p.price;
+      return `
+        <div class="cart-item wish-item" data-id="${id}">
+          <div class="cart-item__media"><img src="${p.img}" alt="${p.name}" /></div>
+          <div>
+            <span class="cart-item__cat">${catLabel(p.category)}</span>
+            <div class="cart-item__name">${p.name}</div>
+            <div class="cart-item__price">${onsale ? `<s>${money(p.old)}</s>` : ""}${money(p.price)}</div>
+            <button class="wish-item__add" data-wishadd="${id}">Add to basket</button>
+          </div>
+          <div><button class="cart-item__remove" data-wishremove="${id}">Remove</button></div>
+        </div>`;
+    }).join("");
+  }
+
+  function openWish() {
+    closeCart();
+    renderWish();
+    overlay.hidden = false;
+    wishDrawer.classList.add("is-open");
+    wishDrawer.setAttribute("aria-hidden", "false");
+    document.body.style.overflow = "hidden";
+  }
+  function closeWish() {
+    wishDrawer.classList.remove("is-open");
+    wishDrawer.setAttribute("aria-hidden", "true");
+    if ($("#quickview").classList.contains("is-open") || drawer.classList.contains("is-open")) return;
+    overlay.hidden = true;
+    document.body.style.overflow = "";
+  }
+
+  /* remove a card's heart highlight when it's un-wished elsewhere */
+  function syncWishHeart(id) {
+    const btn = $(`[data-wish="${id}"]`);
+    if (btn) btn.classList.toggle("is-active", wish.includes(id));
   }
 
   /* =====================================================================
@@ -385,13 +444,26 @@
     const quick = t.closest("[data-quick]");
     if (quick) { openQuick(quick.dataset.quick); return; }
 
-    // wishlist
+    // wishlist heart (on cards / quick view)
     const w = t.closest("[data-wish]");
     if (w) {
       const id = w.dataset.wish;
       if (wish.includes(id)) { wish = wish.filter((x) => x !== id); w.classList.remove("is-active"); }
       else { wish.push(id); w.classList.add("is-active"); toast("Saved to your wishlist"); }
-      save(); return;
+      save(); bumpWishBadge(); renderWish(); return;
+    }
+
+    // add to basket from the wishlist drawer
+    const wa = t.closest("[data-wishadd]");
+    if (wa) { addToCart(wa.dataset.wishadd); return; }
+
+    // remove from the wishlist drawer
+    const wr = t.closest("[data-wishremove]");
+    if (wr) {
+      const id = wr.dataset.wishremove;
+      wish = wish.filter((x) => x !== id);
+      save(); syncWishHeart(id); renderWish();
+      return;
     }
 
     // filters
@@ -422,7 +494,10 @@
   $("#cartBtn").addEventListener("click", openCart);
   $("#cartClose").addEventListener("click", closeCart);
   $("#cartEmptyShop").addEventListener("click", () => { closeCart(); location.hash = "#shop"; });
-  overlay.addEventListener("click", () => { closeCart(); });
+  $("#wishBtn").addEventListener("click", openWish);
+  $("#wishClose").addEventListener("click", closeWish);
+  $("#wishEmptyShop").addEventListener("click", () => { closeWish(); location.hash = "#shop"; });
+  overlay.addEventListener("click", () => { closeCart(); closeWish(); });
   /* ---------------- checkout / reserve order (no online payment) ---------------- */
   const checkoutModal = $("#checkoutModal");
 
@@ -598,7 +673,7 @@
 
   /* keyboard */
   document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") { closeQuick(); closeCart(); }
+    if (e.key === "Escape") { closeQuick(); closeCart(); closeWish(); }
   });
 
   /* mobile nav */
@@ -726,5 +801,6 @@
   renderGrid();
   renderReviews();
   renderCart();
+  bumpWishBadge();
   applyDeepLinks();
 })();
