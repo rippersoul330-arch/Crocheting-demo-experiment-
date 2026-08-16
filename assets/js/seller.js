@@ -438,5 +438,9 @@
   });
 
   /* ---------- go ---------- */
+  // Arriving from "Sell with us" (?signup=1) → show the create-account form first.
+  try {
+    if (/[?&]signup=1\b/.test(location.search)) $("#showSignup").click();
+  } catch (e) { /* ignore */ }
   refreshAuth();
 })();
