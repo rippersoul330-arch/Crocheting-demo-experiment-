@@ -181,7 +181,7 @@
           </div>
 
           <div class="field">
-            <label for="p_motif">Art motif</label>
+            <label for="p_motif">Art motif (fallback if no photo)</label>
             <select id="p_motif">
               <option value="blanket">Blanket</option>
               <option value="sweater">Sweater</option>
@@ -195,9 +195,16 @@
               <option value="booties">Booties</option>
             </select>
           </div>
-          <div class="field">
-            <label for="p_image">Photo URL (optional)</label>
-            <input type="text" id="p_image" placeholder="https://…" />
+
+          <div class="field col-full">
+            <label>Product photos</label>
+            <div class="uploader">
+              <input type="file" id="p_files" accept="image/*" multiple hidden />
+              <button type="button" class="btn btn--ghost btn--sm" id="p_uploadBtn">＋ Upload photos</button>
+              <span class="uploader__hint" id="p_uploadHint">Add one or more from your device. The first photo is the main image.</span>
+            </div>
+            <div class="thumbs" id="p_thumbs"></div>
+            <input type="hidden" id="p_image" />
           </div>
 
           <div class="col-3">
@@ -263,6 +270,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="assets/js/supabase-config.js"></script>
   <script src="assets/js/products.js"></script>
+  <script src="assets/js/image-upload.js"></script>
   <script src="assets/js/seller.js"></script>
 </body>
 </html>
