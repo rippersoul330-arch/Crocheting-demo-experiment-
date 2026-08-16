@@ -213,6 +213,18 @@
 
   /* ---------- product modal ---------- */
   const modal = $("#productModal");
+  let currentImages = [];
+
+  function renderThumbs() {
+    $("#p_thumbs").innerHTML = currentImages.map((url, i) => `
+      <div class="thumb">
+        <img src="${url}" alt="" />
+        <button type="button" class="thumb__remove" data-remove-img="${i}" aria-label="Remove photo">×</button>
+        ${i === 0 ? '<span class="thumb__badge">Main</span>' : ""}
+      </div>`).join("");
+    $("#p_image").value = currentImages[0] || "";
+    updatePreview();
+  }
 
   function openModal(product) {
     const p = product || {};
@@ -233,7 +245,10 @@
     setVal("p_compare", p.compare_at_cents != null ? p.compare_at_cents / 100 : "");
     setVal("p_tag", p.tag || "");
     setVal("p_stock", p.stock != null ? p.stock : "");
-    setVal("p_image", p.image_url || "");
+    currentImages = Array.isArray(p.images) && p.images.length
+      ? p.images.slice()
+      : (p.image_url ? [p.image_url] : []);
+    renderThumbs();
     setVal("p_blurb", p.blurb || "");
     setVal("p_materials", (p.materials || []).join("\n"));
     $("#p_active").checked = product ? !!p.active : true;
@@ -258,7 +273,39 @@
     $("#" + id + "_t").addEventListener("input", () => { const v = $("#" + id + "_t").value.trim(); if (/^#[0-9a-fA-F]{6}$/.test(v)) { $("#" + id).value = v; updatePreview(); } });
   });
   $("#p_motif").addEventListener("change", updatePreview);
-  $("#p_image").addEventListener("input", updatePreview);
+
+  // ----- photo upload + gallery -----
+  $("#p_uploadBtn").addEventListener("click", () => $("#p_files").click());
+  $("#p_files").addEventListener("change", async (e) => {
+    const files = Array.from(e.target.files || []);
+    if (!files.length) return;
+    const up = document.querySelector(".uploader");
+    const hint = $("#p_uploadHint");
+    const orig = hint.textContent;
+    up.classList.add("is-busy");
+    try {
+      for (const file of files) {
+        hint.textContent = `Uploading ${file.name}…`;
+        const url = await window.uploadProductImage(db, file, currentUser ? currentUser.id : "shop");
+        currentImages.push(url);
+        renderThumbs();
+      }
+      hint.textContent = orig;
+      toast("Photo added");
+    } catch (err) {
+      hint.textContent = err.message || "Upload failed";
+      toast(err.message || "Upload failed", true);
+    } finally {
+      up.classList.remove("is-busy");
+      e.target.value = "";
+    }
+  });
+  $("#p_thumbs").addEventListener("click", (e) => {
+    const rm = e.target.closest("[data-remove-img]");
+    if (!rm) return;
+    currentImages.splice(parseInt(rm.dataset.removeImg, 10), 1);
+    renderThumbs();
+  });
 
   $("#addProductBtn").addEventListener("click", () => {
     if (!sellerProfile || !sellerProfile.shop_name) { switchTab("shop"); toast("Please set up your shop first", true); return; }
@@ -296,7 +343,8 @@
       price_cents: Math.round(priceVal * 100),
       compare_at_cents: !isNaN(compareVal) && compareVal > 0 ? Math.round(compareVal * 100) : null,
       tag: $("#p_tag").value.trim() || null,
-      image_url: $("#p_image").value.trim() || null,
+      images: currentImages,
+      image_url: currentImages[0] || null,
       stock: stockVal === "" ? null : parseInt(stockVal, 10),
       active: $("#p_active").checked,
     };

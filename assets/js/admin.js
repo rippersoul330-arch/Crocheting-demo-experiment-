@@ -233,6 +233,18 @@
      PRODUCT EDITOR MODAL
      ===================================================================== */
   const modal = $("#productModal");
+  let currentImages = [];
+
+  function renderThumbs() {
+    $("#p_thumbs").innerHTML = currentImages.map((url, i) => `
+      <div class="thumb">
+        <img src="${url}" alt="" />
+        <button type="button" class="thumb__remove" data-remove-img="${i}" aria-label="Remove photo">×</button>
+        ${i === 0 ? '<span class="thumb__badge">Main</span>' : ""}
+      </div>`).join("");
+    $("#p_image").value = currentImages[0] || "";
+    updatePreview();
+  }
 
   function openModal(product) {
     const p = product || {};
@@ -257,7 +269,10 @@
     setVal("p_rating", p.rating != null ? p.rating : 5.0);
     setVal("p_reviews", p.review_count != null ? p.review_count : 0);
     setVal("p_sort", p.sort_order != null ? p.sort_order : (productsCache.length + 1));
-    setVal("p_image", p.image_url || "");
+    currentImages = Array.isArray(p.images) && p.images.length
+      ? p.images.slice()
+      : (p.image_url ? [p.image_url] : []);
+    renderThumbs();
     setVal("p_blurb", p.blurb || "");
     setVal("p_materials", (p.materials || []).join("\n"));
     $("#p_featured").checked = !!p.featured;
@@ -296,7 +311,42 @@
     });
   });
   $("#p_motif").addEventListener("change", updatePreview);
-  $("#p_image").addEventListener("input", updatePreview);
+
+  // ----- photo upload + gallery -----
+  $("#p_uploadBtn").addEventListener("click", () => $("#p_files").click());
+  $("#p_files").addEventListener("change", async (e) => {
+    const files = Array.from(e.target.files || []);
+    if (!files.length) return;
+    const up = document.querySelector(".uploader");
+    const hint = $("#p_uploadHint");
+    const orig = hint.textContent;
+    up.classList.add("is-busy");
+    const { data: authData } = await db.auth.getUser();
+    const uid = (authData && authData.user && authData.user.id) || "admin";
+    try {
+      for (const file of files) {
+        hint.textContent = `Uploading ${file.name}…`;
+        const url = await window.uploadProductImage(db, file, uid);
+        currentImages.push(url);
+        renderThumbs();
+      }
+      hint.textContent = orig;
+      toast("Photo added");
+    } catch (err) {
+      hint.textContent = err.message || "Upload failed";
+      toast(err.message || "Upload failed", true);
+    } finally {
+      up.classList.remove("is-busy");
+      e.target.value = "";
+    }
+  });
+  $("#p_thumbs").addEventListener("click", (e) => {
+    const rm = e.target.closest("[data-remove-img]");
+    if (!rm) return;
+    currentImages.splice(parseInt(rm.dataset.removeImg, 10), 1);
+    renderThumbs();
+  });
+
   $("#p_name").addEventListener("input", () => {
     const slug = $("#p_slug");
     if (!slug.dataset.touched) slug.value = slugify($("#p_name").value);
@@ -345,7 +395,8 @@
       rating: parseFloat($("#p_rating").value) || 5.0,
       review_count: parseInt($("#p_reviews").value, 10) || 0,
       sort_order: parseInt($("#p_sort").value, 10) || 0,
-      image_url: $("#p_image").value.trim() || null,
+      images: currentImages,
+      image_url: currentImages[0] || null,
       stock: stockVal === "" ? null : parseInt(stockVal, 10),
       featured: $("#p_featured").checked,
       active: $("#p_active").checked,

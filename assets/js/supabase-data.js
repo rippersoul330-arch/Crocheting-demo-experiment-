@@ -45,10 +45,12 @@
       blurb: row.blurb || "",
       materials: Array.isArray(row.materials) ? row.materials : [],
       maker: row.sellers && row.sellers.shop_name ? row.sellers.shop_name : undefined,
+      images: Array.isArray(row.images) ? row.images.filter(Boolean) : [],
     };
-    // Use a real photo if one was uploaded, otherwise the hand-drawn SVG art.
+    // Main image: uploaded photo if present, else the hand-drawn SVG art.
     p.img =
       row.image_url ||
+      p.images[0] ||
       (window.LoopIvy && window.LoopIvy.buildProductImage
         ? window.LoopIvy.buildProductImage(p)
         : "");
