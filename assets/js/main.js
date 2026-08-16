@@ -406,8 +406,11 @@
           <div class="qv__reviews-list" id="qvReviewsList"></div>
           <form class="qv__review-form" id="qvReviewForm" novalidate>
             <p class="qv__review-label">Leave a review</p>
-            <div class="star-pick" id="qvStarPick" role="radiogroup" aria-label="Your rating">
-              ${[1, 2, 3, 4, 5].map((n) => `<button type="button" class="star-pick__star" data-star="${n}" aria-label="${n} star${n > 1 ? "s" : ""}">★</button>`).join("")}
+            <div class="qv__review-rate">
+              <span class="qv__review-ratelabel">Your rating <em>(tap a star)</em></span>
+              <div class="star-pick" id="qvStarPick" role="radiogroup" aria-label="Your rating">
+                ${[1, 2, 3, 4, 5].map((n) => `<button type="button" class="star-pick__star" data-star="${n}" aria-label="${n} star${n > 1 ? "s" : ""}">★</button>`).join("")}
+              </div>
             </div>
             <input type="text" id="qvReviewName" class="qv__review-input" placeholder="Your name" autocomplete="name" maxlength="80" />
             <textarea id="qvReviewText" class="qv__review-input" rows="3" placeholder="Tell others what you loved…" maxlength="2000"></textarea>
@@ -480,7 +483,13 @@
     note.textContent = ""; note.classList.remove("is-ok");
     const name = nameEl.value.trim();
     const comment = textEl.value.trim();
-    if (!qvReviewRating) { note.textContent = "Please pick a star rating."; return; }
+    if (!qvReviewRating) {
+      note.textContent = "Please tap a star to rate this piece first.";
+      const sp = $("#qvStarPick");
+      if (sp) { sp.classList.add("is-missing"); setTimeout(() => sp.classList.remove("is-missing"), 1200); }
+      if (note.scrollIntoView) note.scrollIntoView({ block: "nearest" });
+      return;
+    }
     if (!name) { note.textContent = "Please add your name."; return; }
     if (!window.LoopIvyBackend || !window.LoopIvyBackend.saveReview) { note.textContent = "Reviews aren't available yet."; return; }
 
