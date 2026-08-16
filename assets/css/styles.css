@@ -692,9 +692,14 @@ h1, h2, h3, h4 { font-family: var(--serif); font-weight: 500; line-height: 1.06;
 .qv__review-rate { display: flex; align-items: center; gap: .7rem; flex-wrap: wrap; }
 .qv__review-ratelabel { font-size: .82rem; color: var(--espresso); font-weight: 500; }
 .qv__review-ratelabel em { color: var(--espresso-2); font-style: normal; font-weight: 400; }
-.star-pick { display: flex; gap: .2rem; }
-.star-pick__star { font-size: 1.9rem; line-height: 1; color: var(--line); cursor: pointer; transition: color .15s, transform .15s; }
-.star-pick__star:hover { transform: scale(1.15); color: var(--gold); }
+.star-pick { display: flex; gap: .15rem; }
+.star-pick__star {
+  font-size: 2rem; line-height: 1; color: var(--line); cursor: pointer;
+  padding: .3rem .35rem; min-width: 44px; min-height: 44px;   /* comfortable touch target */
+  touch-action: manipulation; -webkit-tap-highlight-color: transparent;
+  transition: color .12s, transform .12s;
+}
+.star-pick__star:hover, .star-pick__star:active { transform: scale(1.12); color: var(--gold); }
 .star-pick__star.is-active { color: var(--gold); }
 .star-pick.is-missing { animation: star-shake .5s; }
 .star-pick.is-missing .star-pick__star { color: var(--danger, #c0512e); }
