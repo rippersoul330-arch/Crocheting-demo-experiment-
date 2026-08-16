@@ -317,6 +317,32 @@ h1, h2, h3, h4 { font-family: var(--serif); font-weight: 500; line-height: 1.06;
 /* ------------------------------------------------------------------ *
  * 9. Shop toolbar + product grid
  * ------------------------------------------------------------------ */
+/* seller storefront banner (shown when arriving via a ?seller= link) */
+.seller-banner {
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.8rem; padding: 1rem 1.3rem;
+  background: var(--cream-2); border: 1.5px solid var(--line);
+  border-radius: 16px; box-shadow: var(--shadow-sm);
+}
+.seller-banner__info { display: flex; align-items: center; gap: .9rem; min-width: 0; }
+.seller-banner__avatar {
+  flex: 0 0 auto; width: 46px; height: 46px; border-radius: 50%;
+  display: grid; place-items: center;
+  font-family: var(--serif); font-size: 1.3rem; font-weight: 600; color: #fff;
+  background: var(--clay); text-transform: uppercase;
+}
+.seller-banner__eyebrow {
+  display: block; font-size: .72rem; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--espresso-2);
+}
+.seller-banner__name { font-family: var(--serif); font-size: 1.25rem; color: var(--espresso); line-height: 1.2; }
+@media (max-width: 560px) {
+  .seller-banner { padding: .85rem 1rem; }
+  .seller-banner__name { font-size: 1.1rem; }
+  #sellerBannerClear { width: 100%; }
+}
+
 .shop__toolbar {
   display: flex; align-items: center; justify-content: space-between; gap: 1rem;
   margin-bottom: 2.4rem; flex-wrap: wrap;

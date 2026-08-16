@@ -11,12 +11,28 @@
   const stars = (r) => "★★★★★".slice(0, Math.round(r)) + "☆☆☆☆☆".slice(0, 5 - Math.round(r));
   const byId = (id) => PRODUCTS.find((p) => p.id === id);
   const FREE_SHIP = 1500;
+  /* turn a shop name into a URL-safe handle, e.g. "Maggie's Yarn" -> "maggies-yarn" */
+  const slugify = (s) => String(s || "").toLowerCase().trim()
+    .replace(/['’]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
 
   /* ---------------- state ---------------- */
   let cart = load("loopivy_cart", {});      // { id: qty }
   let wish = load("loopivy_wish", []);       // [id]
   let activeCat = "all";
   let sortMode = "featured";
+  let activeSeller = null;                   // slug of the seller being viewed (from ?seller=)
+  let pendingProduct = null;                 // product id/slug to auto-open (from ?product=)
+
+  /* Read shareable-link params: ?seller=<handle> and/or ?product=<slug> */
+  (function readLinkParams() {
+    try {
+      const q = new URLSearchParams(location.search);
+      const s = q.get("seller") || q.get("shop");
+      if (s) activeSeller = slugify(s);
+      const p = q.get("product") || q.get("item");
+      if (p) pendingProduct = p.trim();
+    } catch (e) { /* ignore */ }
+  })();
 
   function load(key, fallback) {
     try { return JSON.parse(localStorage.getItem(key)) ?? fallback; }
@@ -78,8 +94,16 @@
   /* =====================================================================
      Featured collection
      ===================================================================== */
+  /* keep only the active seller's products (no-op when browsing everyone) */
+  function sellerScope(list) {
+    if (!activeSeller) return list;
+    return list.filter((p) => p.maker && slugify(p.maker) === activeSeller);
+  }
+
   function renderFeatured() {
-    const items = PRODUCTS.filter((p) => p.featured).sort((a, b) => a.featured - b.featured);
+    let items = sellerScope(PRODUCTS.filter((p) => p.featured)).sort((a, b) => a.featured - b.featured);
+    // if this seller has no "featured" flags, spotlight their first few pieces
+    if (activeSeller && items.length === 0) items = sellerScope(PRODUCTS.slice()).slice(0, 3);
     $("#featuredGrid").innerHTML = items.map((p, i) => `
       <article class="fcard" data-quick="${p.id}" style="transition-delay:${i * 70}ms">
         <div class="fcard__img" style="background-image:url('${p.img}')"></div>
@@ -106,8 +130,37 @@
     ).join("");
   }
 
+  /* Show/hide the "You're shopping from <seller>" banner. */
+  function renderSellerBanner() {
+    const banner = $("#sellerBanner");
+    if (!banner) return;
+    if (!activeSeller) { banner.hidden = true; return; }
+    // resolve the seller's display name from their products
+    const match = PRODUCTS.find((p) => p.maker && slugify(p.maker) === activeSeller);
+    const name = match ? match.maker : activeSeller.replace(/-/g, " ");
+    $("#sellerBannerName").textContent = name;
+    $("#sellerBannerAvatar").textContent = name.charAt(0);
+    banner.hidden = false;
+  }
+
+  /* Clear the seller filter and return to the full marketplace. */
+  function clearSeller() {
+    activeSeller = null;
+    renderSellerBanner();
+    renderFeatured();
+    renderGrid();
+    // drop the ?seller= param from the URL without reloading
+    try {
+      const url = new URL(location.href);
+      url.searchParams.delete("seller");
+      url.searchParams.delete("shop");
+      history.replaceState(null, "", url.pathname + (url.search || "") + url.hash);
+    } catch (e) { /* ignore */ }
+  }
+
   function renderGrid() {
-    let list = activeCat === "all" ? PRODUCTS.slice() : PRODUCTS.filter((p) => p.category === activeCat);
+    let list = sellerScope(PRODUCTS.slice());
+    if (activeCat !== "all") list = list.filter((p) => p.category === activeCat);
     switch (sortMode) {
       case "price-asc":  list.sort((a, b) => a.price - b.price); break;
       case "price-desc": list.sort((a, b) => b.price - a.price); break;
@@ -513,6 +566,26 @@
     toast("Browse the full atelier below");
   });
 
+  /* "View all makers" — leave a seller's storefront */
+  const sellerClearBtn = $("#sellerBannerClear");
+  if (sellerClearBtn) sellerClearBtn.addEventListener("click", clearSeller);
+
+  /* Deep links: ?seller= scrolls to the shop, ?product= opens that item. */
+  function applyDeepLinks() {
+    if (activeSeller) {
+      const match = PRODUCTS.find((p) => p.maker && slugify(p.maker) === activeSeller);
+      if (match) {
+        const shop = document.getElementById("shop");
+        if (shop) shop.scrollIntoView({ behavior: "smooth" });
+      }
+    }
+    if (pendingProduct) {
+      const p = byId(pendingProduct) ||
+        PRODUCTS.find((x) => slugify(x.name) === slugify(pendingProduct));
+      if (p) { openQuick(p.id); pendingProduct = null; }
+    }
+  }
+
   /* keyboard */
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") { closeQuick(); closeCart(); }
@@ -544,8 +617,10 @@
     PRODUCTS = (e.detail && e.detail.length ? e.detail : window.LoopIvy.PRODUCTS);
     renderFeatured();
     renderFilters();
+    renderSellerBanner();
     renderGrid();
     renderCart();
+    applyDeepLinks();
   });
 
   /* newsletter */
@@ -637,7 +712,9 @@
      ===================================================================== */
   renderFeatured();
   renderFilters();
+  renderSellerBanner();
   renderGrid();
   renderReviews();
   renderCart();
+  applyDeepLinks();
 })();
