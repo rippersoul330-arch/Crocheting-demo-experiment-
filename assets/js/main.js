@@ -452,11 +452,21 @@
     if (el) el.classList.toggle("is-hidden", !shipping);
   }
 
+  /* pre-fill name + email when a buyer is signed in (buyer-auth.js) */
+  function prefillFromBuyer() {
+    const b = window.LoopIvyBuyer;
+    if (!b || !b.user) return;
+    const nameEl = $("#coName"), emailEl = $("#coEmail");
+    if (nameEl && !nameEl.value.trim() && b.name) nameEl.value = b.name;
+    if (emailEl && !emailEl.value.trim() && b.email) emailEl.value = b.email;
+  }
+
   function openCheckout() {
     if (cartCount() === 0) { toast("Your basket is empty"); return; }
     closeCart();
     renderCheckoutSummary();
     toggleShipFields();
+    prefillFromBuyer();
     const note = $("#checkoutNote"); note.textContent = ""; note.classList.remove("is-ok");
     checkoutModal.classList.add("is-open");
     checkoutModal.setAttribute("aria-hidden", "false");
