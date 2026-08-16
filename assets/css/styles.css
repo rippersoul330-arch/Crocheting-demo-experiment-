@@ -670,6 +670,36 @@ h1, h2, h3, h4 { font-family: var(--serif); font-weight: 500; line-height: 1.06;
 .qv__qty button { width: 40px; height: 46px; font-size: 1.2rem; }
 .qv__qty span { min-width: 30px; text-align: center; }
 
+/* product reviews (inside quick view) */
+.qv__reviews { margin-top: 1.6rem; padding-top: 1.4rem; border-top: 1px solid var(--line); }
+.qv__reviews-head { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; flex-wrap: wrap; }
+.qv__reviews-title { font-family: var(--serif); font-size: 1.25rem; }
+.qv__reviews-avg { font-size: .85rem; color: var(--espresso-2); display: inline-flex; align-items: center; gap: .35rem; }
+.qv__reviews-avg .card__stars { font-size: 1rem; color: var(--gold); }
+.qv__reviews-list { display: grid; gap: .9rem; margin-bottom: 1.5rem; }
+.qv__reviews-empty { color: var(--espresso-2); font-size: .9rem; }
+.qv__review { background: var(--paper); border: 1px solid var(--line-soft); border-radius: 14px; padding: .9rem 1rem; }
+.qv__review-top { display: flex; align-items: center; gap: .7rem; }
+.qv__review-avatar { flex: 0 0 auto; width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: var(--sage); color: #fff; font-family: var(--serif); font-weight: 600; text-transform: uppercase; }
+.qv__review-meta { flex: 1; min-width: 0; }
+.qv__review-name { font-weight: 500; font-size: .92rem; }
+.qv__review-stars .card__stars { font-size: .9rem; color: var(--gold); }
+.qv__review-date { font-size: .74rem; color: var(--espresso-2); white-space: nowrap; }
+.qv__review-text { margin-top: .55rem; font-size: .9rem; color: var(--espresso-2); line-height: 1.5; }
+
+.qv__review-form { display: grid; gap: .7rem; padding: 1.1rem; background: var(--cream-2); border-radius: 16px; }
+.qv__review-label { font-size: .74rem; letter-spacing: .12em; text-transform: uppercase; color: var(--espresso-2); font-weight: 500; }
+.star-pick { display: flex; gap: .2rem; }
+.star-pick__star { font-size: 1.7rem; line-height: 1; color: var(--line); transition: color .15s, transform .15s; }
+.star-pick__star:hover { transform: scale(1.12); }
+.star-pick__star.is-active { color: var(--gold); }
+.qv__review-input { width: 100%; padding: .7em 1em; border: 1.5px solid var(--line); border-radius: 12px; background: var(--paper); color: var(--espresso); outline: none; font: inherit; transition: border-color .25s, box-shadow .25s; }
+.qv__review-input:focus { border-color: var(--clay); box-shadow: 0 0 0 3px rgba(192,113,75,.16); }
+.qv__review-input::placeholder { color: var(--espresso-2); opacity: .7; }
+textarea.qv__review-input { resize: vertical; min-height: 68px; }
+.qv__review-note { font-size: .85rem; min-height: 1.1em; color: var(--clay-deep); margin: 0; }
+.qv__review-note.is-ok { color: var(--sage-deep); }
+
 /* ------------------------------------------------------------------ *
  * 16b. Checkout / order modal
  * ------------------------------------------------------------------ */

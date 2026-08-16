@@ -9,6 +9,8 @@
   const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
   const money = (n) => "₹" + Number(n).toLocaleString("en-IN");
   const stars = (r) => "★★★★★".slice(0, Math.round(r)) + "☆☆☆☆☆".slice(0, 5 - Math.round(r));
+  const esc = (s) => String(s == null ? "" : s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const fmtDate = (iso) => { try { return new Date(iso).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }); } catch { return ""; } };
   const byId = (id) => PRODUCTS.find((p) => p.id === id);
   const FREE_SHIP = 1500;
   /* turn a shop name into a URL-safe handle, e.g. "Maggie's Yarn" -> "maggies-yarn" */
@@ -361,10 +363,14 @@
      ===================================================================== */
   const modal = $("#quickview");
   let qvQty = 1;
+  let qvReviewRating = 0;   // stars picked in the review form
+  let qvProductId = null;   // product currently shown (guards async review loads)
 
   function openQuick(id) {
     const p = byId(id); if (!p) return;
     qvQty = 1;
+    qvReviewRating = 0;
+    qvProductId = p.id;
     const onsale = p.old && p.old > p.price;
     const gallery = (p.images && p.images.length ? p.images : [p.img]);
     $("#quickviewPanel").innerHTML = `
@@ -379,7 +385,7 @@
         <span class="qv__cat">${catLabel(p.category)}</span>
         <h3 class="qv__name">${p.name}</h3>
         ${p.maker ? `<p class="qv__maker">by ${p.maker}</p>` : ""}
-        <div class="qv__rating"><span class="card__stars">${stars(p.rating)}</span> ${p.rating.toFixed(1)} · ${p.reviews} reviews</div>
+        <div class="qv__rating" id="qvRating"><span class="card__stars">${stars(p.rating)}</span> ${p.rating.toFixed(1)} · ${p.reviews} reviews</div>
         <div class="qv__price">${onsale ? `<s>${money(p.old)}</s>` : ""}${money(p.price)}</div>
         <p class="qv__desc">${p.blurb}</p>
         <ul class="qv__meta">${p.materials.map((m) => `<li>${m}</li>`).join("")}</ul>
@@ -391,10 +397,114 @@
           </div>
           <button class="btn btn--primary btn--block" data-qvadd="${p.id}">Add to basket · ${money(p.price)}</button>
         </div>
+
+        <section class="qv__reviews">
+          <div class="qv__reviews-head">
+            <h4 class="qv__reviews-title">Reviews</h4>
+            <span class="qv__reviews-avg" id="qvReviewsAvg"></span>
+          </div>
+          <div class="qv__reviews-list" id="qvReviewsList"></div>
+          <form class="qv__review-form" id="qvReviewForm" novalidate>
+            <p class="qv__review-label">Leave a review</p>
+            <div class="star-pick" id="qvStarPick" role="radiogroup" aria-label="Your rating">
+              ${[1, 2, 3, 4, 5].map((n) => `<button type="button" class="star-pick__star" data-star="${n}" aria-label="${n} star${n > 1 ? "s" : ""}">★</button>`).join("")}
+            </div>
+            <input type="text" id="qvReviewName" class="qv__review-input" placeholder="Your name" autocomplete="name" maxlength="80" />
+            <textarea id="qvReviewText" class="qv__review-input" rows="3" placeholder="Tell others what you loved…" maxlength="2000"></textarea>
+            <button type="button" class="btn btn--primary btn--block" data-review-submit="${p.id}">Post review</button>
+            <p class="qv__review-note" id="qvReviewNote" role="status"></p>
+          </form>
+        </section>
       </div>`;
     modal.classList.add("is-open");
     modal.setAttribute("aria-hidden", "false");
     document.body.style.overflow = "hidden";
+    // prefill the reviewer name for signed-in buyers, then load existing reviews
+    const buyer = window.LoopIvyBuyer;
+    if (buyer && buyer.name) { const n = $("#qvReviewName"); if (n) n.value = buyer.name; }
+    loadQuickReviews(p.id);
+  }
+
+  /* fetch + render a product's reviews inside the open quick-view */
+  async function loadQuickReviews(slug) {
+    const list = $("#qvReviewsList");
+    const avgEl = $("#qvReviewsAvg");
+    if (!list) return;
+    if (!window.LoopIvyBackend || !window.LoopIvyBackend.fetchReviews) {
+      list.innerHTML = `<p class="qv__reviews-empty">Reviews will appear here once the shop is connected.</p>`;
+      return;
+    }
+    list.innerHTML = `<p class="qv__reviews-empty">Loading reviews…</p>`;
+    try {
+      const rows = await window.LoopIvyBackend.fetchReviews(slug);
+      if (qvProductId !== slug) return;   // user switched/closed in the meantime
+      if (!rows.length) {
+        list.innerHTML = `<p class="qv__reviews-empty">No reviews yet — be the first to share yours!</p>`;
+        if (avgEl) avgEl.textContent = "";
+        return;
+      }
+      const avg = rows.reduce((a, r) => a + r.rating, 0) / rows.length;
+      const summary = `<span class="card__stars">${stars(avg)}</span> ${avg.toFixed(1)} · ${rows.length} review${rows.length > 1 ? "s" : ""}`;
+      if (avgEl) avgEl.innerHTML = summary;
+      const hdr = $("#qvRating");
+      if (hdr) hdr.innerHTML = summary;   // reflect real reviews in the header rating
+      list.innerHTML = rows.map((r) => `
+        <div class="qv__review">
+          <div class="qv__review-top">
+            <span class="qv__review-avatar">${esc((r.reviewer_name || "?").charAt(0))}</span>
+            <div class="qv__review-meta">
+              <div class="qv__review-name">${esc(r.reviewer_name || "Anonymous")}</div>
+              <div class="qv__review-stars"><span class="card__stars">${stars(r.rating)}</span></div>
+            </div>
+            <span class="qv__review-date">${fmtDate(r.created_at)}</span>
+          </div>
+          ${r.comment ? `<p class="qv__review-text">${esc(r.comment)}</p>` : ""}
+        </div>`).join("");
+    } catch (err) {
+      console.warn("[LoopIvy] reviews load failed:", err.message || err);
+      list.innerHTML = `<p class="qv__reviews-empty">Couldn't load reviews right now.</p>`;
+    }
+  }
+
+  function renderStarPick() {
+    $$("#qvStarPick .star-pick__star").forEach((s) => {
+      s.classList.toggle("is-active", Number(s.dataset.star) <= qvReviewRating);
+    });
+  }
+
+  async function submitReview(slug) {
+    const note = $("#qvReviewNote");
+    const nameEl = $("#qvReviewName");
+    const textEl = $("#qvReviewText");
+    if (!note || !nameEl || !textEl) return;
+    note.textContent = ""; note.classList.remove("is-ok");
+    const name = nameEl.value.trim();
+    const comment = textEl.value.trim();
+    if (!qvReviewRating) { note.textContent = "Please pick a star rating."; return; }
+    if (!name) { note.textContent = "Please add your name."; return; }
+    if (!window.LoopIvyBackend || !window.LoopIvyBackend.saveReview) { note.textContent = "Reviews aren't available yet."; return; }
+
+    const btn = $(`[data-review-submit="${slug}"]`);
+    if (btn) { btn.disabled = true; btn.textContent = "Posting…"; }
+    try {
+      const buyer = window.LoopIvyBuyer;
+      await window.LoopIvyBackend.saveReview({
+        product_slug: slug,
+        reviewer_name: name,
+        rating: qvReviewRating,
+        comment: comment,
+        user_id: buyer && buyer.user ? buyer.user.id : null,
+      });
+      note.textContent = "Thank you! Your review is now live."; note.classList.add("is-ok");
+      textEl.value = ""; qvReviewRating = 0; renderStarPick();
+      toast("Review posted — thank you! 💛");
+      loadQuickReviews(slug);
+    } catch (err) {
+      console.warn("[LoopIvy] review save failed:", err.message || err);
+      note.textContent = "Sorry, couldn't post your review. Please try again.";
+    } finally {
+      if (btn) { btn.disabled = false; btn.textContent = "Post review"; }
+    }
   }
   function closeQuick() {
     modal.classList.remove("is-open");
@@ -497,6 +607,14 @@
     if (t.closest("[data-qvdec]")) { qvQty = Math.max(1, qvQty - 1); $("#qvQty").textContent = qvQty; return; }
     const qvadd = t.closest("[data-qvadd]");
     if (qvadd) { addToCart(qvadd.dataset.qvadd, qvQty); closeQuick(); openCart(); return; }
+
+    // review: pick a star rating
+    const star = t.closest("[data-star]");
+    if (star) { qvReviewRating = Number(star.dataset.star); renderStarPick(); return; }
+
+    // review: submit
+    const rsub = t.closest("[data-review-submit]");
+    if (rsub) { submitReview(rsub.dataset.reviewSubmit); return; }
 
     // modal / drawer close
     if (t.closest("[data-close]")) { closeQuick(); return; }

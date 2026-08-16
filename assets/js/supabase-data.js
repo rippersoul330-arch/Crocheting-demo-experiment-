@@ -112,6 +112,30 @@
       if (error) throw error;
     },
 
+    /* Fetch approved reviews for a product (by its slug/id). */
+    async fetchReviews(slug) {
+      const { data, error } = await client
+        .from("reviews")
+        .select("*")
+        .eq("product_slug", slug)
+        .eq("approved", true)
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data || [];
+    },
+
+    /* Post a new review (insert-only; RLS blocks read-back for the public). */
+    async saveReview(payload) {
+      const { error } = await client.from("reviews").insert({
+        product_slug: payload.product_slug,
+        reviewer_name: payload.reviewer_name,
+        rating: payload.rating,
+        comment: payload.comment || null,
+        user_id: payload.user_id || null,
+      });
+      if (error) throw error;
+    },
+
     /* Save a reserve/pickup order (no online payment).
        We generate the order id client-side so we can link order_items
        without needing read-back permission (blocked for the public by RLS). */
