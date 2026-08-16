@@ -699,6 +699,40 @@ h1, h2, h3, h4 { font-family: var(--serif); font-weight: 500; line-height: 1.06;
 #placeOrderBtn { margin-top: .4rem; }
 
 /* ------------------------------------------------------------------ *
+ * 16d. Buyer account modal + header account button
+ * ------------------------------------------------------------------ */
+.account-btn { position: relative; }
+.account-dot {
+  position: absolute; top: 9px; right: 9px; width: 9px; height: 9px; border-radius: 50%;
+  background: var(--sage-deep); border: 2px solid var(--cream); box-shadow: 0 0 0 1px rgba(0,0,0,.05);
+}
+.icon-btn.is-authed { color: var(--clay-deep); }
+
+.auth-box { width: min(440px, 100%); }
+.auth-box__scroll { max-height: 90dvh; overflow-y: auto; padding: clamp(1.8rem, 4vw, 2.6rem); }
+.auth-box__close { position: absolute; top: 1rem; right: 1rem; z-index: 3; background: rgba(255,253,249,.9); }
+.auth-box__head { text-align: center; margin-bottom: 1.6rem; }
+.auth-box__mark { width: 44px; height: 44px; color: var(--clay); margin-bottom: .6rem; }
+.auth-box__avatar {
+  display: inline-grid; place-items: center; width: 58px; height: 58px; border-radius: 50%;
+  background: var(--clay); color: #fff; font-family: var(--serif); font-size: 1.7rem; font-weight: 600;
+  text-transform: uppercase; margin-bottom: .7rem;
+}
+.auth-box__title { font-size: clamp(1.5rem, 3vw, 1.9rem); margin: 0 0 .3rem; }
+.auth-box__sub { color: var(--espresso-2); font-size: .92rem; margin: 0; }
+.auth-box form { display: grid; gap: 1rem; margin-bottom: 1rem; }
+.auth-box form[hidden] { display: none; }
+.auth-box form .btn { margin-top: .2rem; }
+.auth-box__switch { text-align: center; font-size: .9rem; color: var(--espresso-2); margin: 0 0 .5rem; }
+.auth-box__switch a { color: var(--clay-deep); font-weight: 600; text-decoration: underline; text-underline-offset: 2px; }
+.auth-box__seller {
+  text-align: center; font-size: .84rem; color: var(--espresso-2);
+  margin: 0; padding-top: 1rem; border-top: 1px solid var(--line-soft);
+}
+.auth-box__seller a { color: var(--espresso); font-weight: 600; }
+@media (max-width: 480px) { .auth-box { width: 100%; } }
+
+/* ------------------------------------------------------------------ *
  * 16c. Seller CTA + nav sell link
  * ------------------------------------------------------------------ */
 .nav__sell { color: var(--clay-deep) !important; font-weight: 600; }

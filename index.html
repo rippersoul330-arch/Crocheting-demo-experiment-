@@ -59,9 +59,10 @@
       </nav>
 
       <div class="header__actions">
-        <a class="icon-btn" href="seller.html" id="signInBtn" aria-label="Seller sign in" title="Seller sign in">
+        <button class="icon-btn account-btn" id="accountBtn" aria-label="Your account" title="Sign in">
           <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>
-        </a>
+          <span class="account-dot" id="accountDot" hidden></span>
+        </button>
         <button class="icon-btn" id="searchBtn" aria-label="Search" title="Search">
           <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg>
         </button>
@@ -542,6 +543,56 @@
     </div>
   </div>
 
+  <!-- ===== Buyer account modal ===== -->
+  <div class="modal" id="buyerAuth" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Your account">
+    <div class="modal__overlay" data-auth-close></div>
+    <div class="modal__panel modal__panel--form auth-box">
+      <button class="icon-btn auth-box__close" data-auth-close aria-label="Close">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
+      </button>
+
+      <!-- Signed OUT: sign in / create account -->
+      <div class="auth-box__scroll" id="authForms">
+        <div class="auth-box__head">
+          <svg class="auth-box__mark" viewBox="0 0 48 48" aria-hidden="true"><use href="#logo-mark"></use></svg>
+          <h3 class="auth-box__title" id="authTitle">Welcome back</h3>
+          <p class="auth-box__sub" id="authSub">Sign in for a faster checkout — your details fill in automatically.</p>
+        </div>
+
+        <!-- sign in -->
+        <form id="buyerLoginForm" novalidate>
+          <div class="cfield"><label for="biEmail">Email</label><input type="email" id="biEmail" autocomplete="username" required /></div>
+          <div class="cfield"><label for="biPassword">Password</label><input type="password" id="biPassword" autocomplete="current-password" required /></div>
+          <button type="submit" class="btn btn--primary btn--block" id="biLoginBtn">Sign in</button>
+          <p class="checkout__note" id="biLoginNote" role="status"></p>
+        </form>
+
+        <!-- create account -->
+        <form id="buyerSignupForm" novalidate hidden>
+          <div class="cfield"><label for="suName">Your name</label><input type="text" id="suName" autocomplete="name" required /></div>
+          <div class="cfield"><label for="suBuyerEmail">Email</label><input type="email" id="suBuyerEmail" autocomplete="username" required /></div>
+          <div class="cfield"><label for="suBuyerPassword">Password</label><input type="password" id="suBuyerPassword" autocomplete="new-password" placeholder="At least 6 characters" required /></div>
+          <button type="submit" class="btn btn--primary btn--block" id="biSignupBtn">Create account</button>
+          <p class="checkout__note" id="biSignupNote" role="status"></p>
+        </form>
+
+        <p class="auth-box__switch"><span id="authSwitchText">New to Loop &amp; Ivy?</span> <a href="#" id="authToggle">Create an account</a></p>
+        <p class="auth-box__seller">Are you a maker? <a href="seller.html?signup=1">Sell with us &rarr;</a></p>
+      </div>
+
+      <!-- Signed IN: account panel -->
+      <div class="auth-box__scroll" id="authAccount" hidden>
+        <div class="auth-box__head">
+          <span class="auth-box__avatar" id="authAvatar">L</span>
+          <h3 class="auth-box__title">Hi, <span id="authName">there</span>!</h3>
+          <p class="auth-box__sub" id="authEmail"></p>
+        </div>
+        <a href="#shop" class="btn btn--primary btn--block" data-auth-close>Continue shopping</a>
+        <button class="btn btn--ghost btn--block" id="buyerSignOut" style="margin-top:.7rem;">Sign out</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ===== Toast ===== -->
   <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
@@ -566,5 +617,7 @@
   <script src="assets/js/main.js"></script>
   <!-- Data layer: loads products from Supabase + saves form submissions -->
   <script src="assets/js/supabase-data.js"></script>
+  <!-- Buyer accounts: sign in / sign up / faster checkout -->
+  <script src="assets/js/buyer-auth.js"></script>
 </body>
 </html>
