@@ -689,10 +689,16 @@ h1, h2, h3, h4 { font-family: var(--serif); font-weight: 500; line-height: 1.06;
 
 .qv__review-form { display: grid; gap: .7rem; padding: 1.1rem; background: var(--cream-2); border-radius: 16px; }
 .qv__review-label { font-size: .74rem; letter-spacing: .12em; text-transform: uppercase; color: var(--espresso-2); font-weight: 500; }
+.qv__review-rate { display: flex; align-items: center; gap: .7rem; flex-wrap: wrap; }
+.qv__review-ratelabel { font-size: .82rem; color: var(--espresso); font-weight: 500; }
+.qv__review-ratelabel em { color: var(--espresso-2); font-style: normal; font-weight: 400; }
 .star-pick { display: flex; gap: .2rem; }
-.star-pick__star { font-size: 1.7rem; line-height: 1; color: var(--line); transition: color .15s, transform .15s; }
-.star-pick__star:hover { transform: scale(1.12); }
+.star-pick__star { font-size: 1.9rem; line-height: 1; color: var(--line); cursor: pointer; transition: color .15s, transform .15s; }
+.star-pick__star:hover { transform: scale(1.15); color: var(--gold); }
 .star-pick__star.is-active { color: var(--gold); }
+.star-pick.is-missing { animation: star-shake .5s; }
+.star-pick.is-missing .star-pick__star { color: var(--danger, #c0512e); }
+@keyframes star-shake { 0%,100% { transform: translateX(0); } 20%,60% { transform: translateX(-5px); } 40%,80% { transform: translateX(5px); } }
 .qv__review-input { width: 100%; padding: .7em 1em; border: 1.5px solid var(--line); border-radius: 12px; background: var(--paper); color: var(--espresso); outline: none; font: inherit; transition: border-color .25s, box-shadow .25s; }
 .qv__review-input:focus { border-color: var(--clay); box-shadow: 0 0 0 3px rgba(192,113,75,.16); }
 .qv__review-input::placeholder { color: var(--espresso-2); opacity: .7; }
