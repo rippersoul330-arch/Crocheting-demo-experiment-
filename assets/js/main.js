@@ -242,8 +242,12 @@
     const p = byId(id); if (!p) return;
     qvQty = 1;
     const onsale = p.old && p.old > p.price;
+    const gallery = (p.images && p.images.length ? p.images : [p.img]);
     $("#quickviewPanel").innerHTML = `
-      <div class="qv__media"><img src="${p.img}" alt="${p.name}" /></div>
+      <div class="qv__media">
+        <img src="${gallery[0]}" alt="${p.name}" id="qvMainImg" />
+        ${gallery.length > 1 ? `<div class="qv__thumbs">${gallery.map((u, i) => `<button type="button" class="qv__thumb ${i === 0 ? "is-active" : ""}" data-qvthumb="${u}"><img src="${u}" alt="" /></button>`).join("")}</div>` : ""}
+      </div>
       <button class="icon-btn qv__close" data-close aria-label="Close">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
       </button>
@@ -314,6 +318,15 @@
     // add to cart
     const add = t.closest("[data-add]");
     if (add) { addToCart(add.dataset.add); return; }
+
+    // quick-view gallery thumbnail → swap main image
+    const qvt = t.closest("[data-qvthumb]");
+    if (qvt) {
+      const mainImg = $("#qvMainImg");
+      if (mainImg) mainImg.src = qvt.dataset.qvthumb;
+      $$(".qv__thumb").forEach((b) => b.classList.toggle("is-active", b === qvt));
+      return;
+    }
 
     // quick view (card button or featured card)
     const quick = t.closest("[data-quick]");
