@@ -375,7 +375,7 @@
     const gallery = (p.images && p.images.length ? p.images : [p.img]);
     $("#quickviewPanel").innerHTML = `
       <div class="qv__media">
-        <img src="${gallery[0]}" alt="${p.name}" id="qvMainImg" />
+        <div class="qv__mainimg"><img src="${gallery[0]}" alt="${p.name}" id="qvMainImg" /></div>
         ${gallery.length > 1 ? `<div class="qv__thumbs">${gallery.map((u, i) => `<button type="button" class="qv__thumb ${i === 0 ? "is-active" : ""}" data-qvthumb="${u}"><img src="${u}" alt="" /></button>`).join("")}</div>` : ""}
       </div>
       <button class="icon-btn qv__close" data-close aria-label="Close">
